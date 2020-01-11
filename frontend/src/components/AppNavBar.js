@@ -9,10 +9,14 @@ import {
 	Container,
 	NavLink,
 } from 'reactstrap';
+import LoginModal from './auth/LoginModal';
+import RegisterModal from './auth/RegisterModal';
 
 class AppNavBar extends Component {
 	state = {
 		isOpen: false,
+		isAuth: false,
+		user: null,
 	};
 
 	toggle = () => {
@@ -22,6 +26,24 @@ class AppNavBar extends Component {
 	};
 
 	render() {
+		const guestLinks = (
+			<Fragment>
+				<NavItem>
+					<LoginModal />
+				</NavItem>
+				<NavItem>
+					<RegisterModal />
+				</NavItem>
+			</Fragment>
+		);
+
+		const authLinks = (
+			<Fragment>
+				<NavItem>
+					<NavLink>Logout</NavLink>
+				</NavItem>
+			</Fragment>
+		);
 		return (
 			<div>
 				<Navbar color="dark" dark expand="sm" className="mb-5">
@@ -30,9 +52,7 @@ class AppNavBar extends Component {
 						<NavbarToggler onClick={this.toggle} />
 						<Collapse isOpen={this.state.isOpen} navbar>
 							<Nav className="ml-auto" navbar>
-								<NavItem>
-									<NavLink href="https://github.com/reactstrap/reactstrap">GitHub</NavLink>
-								</NavItem>
+								{this.state.isAuth ? authLinks : guestLinks}
 							</Nav>
 						</Collapse>
 					</Container>
