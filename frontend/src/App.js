@@ -3,6 +3,7 @@ import { Container } from 'reactstrap';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AppNavBar from './components/AppNavBar';
+import Home from './components/Home';
 
 class App extends Component {
 	render() {
@@ -10,7 +11,7 @@ class App extends Component {
 			<div>
 				<AppNavBar />
 				<Container>
-					<h1>Hello World</h1>
+					<Home />
 				</Container>
 			</div>
 		);
