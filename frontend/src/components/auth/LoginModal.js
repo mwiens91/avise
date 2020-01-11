@@ -12,12 +12,15 @@ import {
 } from 'reactstrap';
 
 class LoginModal extends Component {
-	state = {
-		modal: false,
-		email: '',
-		password: '',
-		msg: null,
-	};
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			username: '',
+			password: '',
+			modal: false,
+		};
+	}
 
 	toggle = () => {
 		this.setState({
@@ -32,12 +35,15 @@ class LoginModal extends Component {
 	onSubmit = (e) => {
 		e.preventDefault();
 
-		const { email, password } = this.state;
+		const { username, password } = this.state;
 
-		const user = {
-			email,
-			password,
-		};
+		// Get auth token from API HERE
+
+		this.setState({
+			username,
+		});
+
+		this.toggle();
 	};
 
 	render() {
@@ -51,12 +57,12 @@ class LoginModal extends Component {
 					<ModalBody>
 						<Form onSubmit={this.onSubmit}>
 							<FormGroup>
-								<Label for="email">Email</Label>
+								<Label for="username">Username</Label>
 								<Input
-									type="email"
-									name="email"
-									id="email"
-									placeholder="Email"
+									type="text"
+									name="username"
+									id="username"
+									placeholder="Username"
 									className="mb-3"
 									onChange={this.onChange}
 								/>
@@ -69,7 +75,7 @@ class LoginModal extends Component {
 									className="mb-3"
 									onChange={this.onChange}
 								/>
-								<Button color="dark" style={{ marginTop: '2rem' }} block>
+								<Button color="success" style={{ marginTop: '2rem' }} block>
 									Login
 								</Button>
 							</FormGroup>

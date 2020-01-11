@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import {
 	Collapse,
 	Navbar,
@@ -16,7 +17,7 @@ class AppNavBar extends Component {
 	state = {
 		isOpen: false,
 		isAuth: false,
-		user: null,
+		username: null,
 	};
 
 	toggle = () => {
@@ -25,11 +26,19 @@ class AppNavBar extends Component {
 		});
 	};
 
+	login = () => {
+		e.preventDefault();
+
+		this.setState({
+			isAuth: true,
+		});
+	};
+
 	render() {
 		const guestLinks = (
 			<Fragment>
 				<NavItem>
-					<LoginModal />
+					<LoginModal login={this.login} />
 				</NavItem>
 				<NavItem>
 					<RegisterModal />
@@ -48,13 +57,16 @@ class AppNavBar extends Component {
 			<div>
 				<Navbar color="dark" dark expand="sm" className="mb-5">
 					<Container>
-						<NavbarBrand href="/">AppName</NavbarBrand>
-						<NavbarToggler onClick={this.toggle} />
-						<Collapse isOpen={this.state.isOpen} navbar>
-							<Nav className="ml-auto" navbar>
-								{this.state.isAuth ? authLinks : guestLinks}
-							</Nav>
-						</Collapse>
+						<Router>
+							<Route />
+							<NavbarBrand href="/">AppName</NavbarBrand>
+							<NavbarToggler onClick={this.toggle} />
+							<Collapse isOpen={this.state.isOpen} navbar>
+								<Nav className="ml-auto" navbar>
+									{this.state.isAuth ? authLinks : guestLinks}
+								</Nav>
+							</Collapse>
+						</Router>
 					</Container>
 				</Navbar>
 			</div>

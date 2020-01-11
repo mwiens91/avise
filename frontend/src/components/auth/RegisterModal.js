@@ -14,8 +14,10 @@ import {
 class RegisterModal extends Component {
 	state = {
 		modal: false,
+		username: '',
 		email: '',
 		password: '',
+		confirm_password: '',
 		msg: null,
 	};
 
@@ -51,12 +53,12 @@ class RegisterModal extends Component {
 					<ModalBody>
 						<Form onSubmit={this.onSubmit}>
 							<FormGroup>
-								<Label for="Name">Name</Label>
+								<Label for="username">Username</Label>
 								<Input
 									type="text"
-									name="name"
-									id="name"
-									placeholder="Name"
+									name="username"
+									id="username"
+									placeholder="Username"
 									className="mb-3"
 									onChange={this.onChange}
 								/>
