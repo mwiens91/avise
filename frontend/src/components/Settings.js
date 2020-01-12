@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Redirect } from 'react-router-dom';
-import { Card, CardBody, CardTitle, Button, Row, Col } from 'reactstrap';
+import { Card, CardBody, Row, Col } from 'reactstrap';
 import EditVapeModal from './EditVapeModal';
 import CreateVapeModal from './CreateVapeModal';
 import EditUserModal from './EditUserModal';
@@ -12,6 +12,10 @@ class Settings extends Component {
 
 	createVape = (data) => {
 		this.props.createVape(data);
+	};
+
+	updatePref = (data) => {
+		this.props.updatePref(data);
 	};
 
 	render() {
@@ -73,7 +77,7 @@ class Settings extends Component {
 								</div>
 							</Col>
 							<Col>
-								<EditUserModal user={user} />
+								<EditUserModal user={user} updatePref={this.updatePref} />
 							</Col>
 						</Row>
 						<ul>

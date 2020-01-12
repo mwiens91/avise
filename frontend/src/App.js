@@ -98,7 +98,22 @@ class App extends Component {
 				user,
 			});
 		} catch (e) {
-			this.setState({ error: 'Failed to update vape' });
+			this.setState({ error: 'Failed to set vape' });
+		}
+	};
+	updatePref = async (data) => {
+		try {
+			const updatedUser = await this.Api.updatePref(data);
+			const user = { ...this.state.user };
+			user.discord_id = updatedUser.discord_id;
+			user.track_nicotine = updatedUser.track_nicotine;
+			user.track_alcohol = updatedUser.track_alcohol;
+
+			this.setState({
+				user,
+			});
+		} catch (e) {
+			this.setState({ error: 'Failed to update user preferences' });
 		}
 	};
 
@@ -131,6 +146,7 @@ class App extends Component {
 									user={user}
 									updateVape={this.updateVape}
 									createVape={this.createVape}
+									updatePref={this.updatePref}
 								/>
 							)}
 						/>

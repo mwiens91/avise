@@ -101,6 +101,21 @@ class Api {
 			}
 			return response.json();
 		});
+
+	updatePref = (userData) =>
+		fetch(`${this.baseApiUrl}/users/${userData.username}`, {
+			method: 'PATCH',
+			headers: {
+				Authorization: `Token ${this.token}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(userData),
+		}).then((response) => {
+			if (!response.ok) {
+				throw Error(response.statusText);
+			}
+			return response.json();
+		});
 }
 
 export default Api;
