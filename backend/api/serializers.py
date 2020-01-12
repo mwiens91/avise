@@ -44,6 +44,7 @@ class UserReadOnlySerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
+            "id",
             "username",
             "track_nicotine",
             "track_alcohol",
