@@ -403,7 +403,7 @@ changeInAlcohol = size;
             totAlcoholVol += size;
             try{api.submitAlcohol(userID.toString(), "beer", changeInAlcohol);}
             catch(error){
-
+                    console.log(error);
             }
             msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol);
             bot.sendMessage({
@@ -476,6 +476,8 @@ changeInAlcohol = size;
         case "refill":
         case "vape":
             api.getUserVape(userID.toString()).then(vape => {
+            
+            if (vape === null)  {return;}
 
             amount = parseInt(amount, 10);
 
@@ -483,7 +485,8 @@ changeInAlcohol = size;
                     // User probably made a mistake and wants to remove that amount of vape juice from the record.
                     amount *= -1;
             }
-            amountNicotine = (amount*vape["strength"]*vape["volume"]);
+        
+            let amountNicotine = (amount*vape["strength"]*vape["volume"]);
             vapeMgNicotineCount += amountNicotine;
             try{api.submitNicotine(userID.toString(), "vape", amountNicotine);}
             catch{}
