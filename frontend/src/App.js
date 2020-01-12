@@ -4,9 +4,11 @@ import { Container } from 'reactstrap';
 import './css/App.css';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/bootstrap-material-design.min.css';
+
 import AppNavBar from './components/AppNavBar';
 import Home from './components/Home';
 import User from './components/User';
+import Settings from './components/Settings';
 
 import Api from './Api';
 
@@ -94,6 +96,10 @@ class App extends Component {
 						<Route
 							path="/user"
 							render={(props) => <User {...props} isAuth={isAuth} user={user} />}
+						/>
+						<Route
+							path="/settings"
+							render={(props) => <Settings {...props} isAuth={isAuth} user={user} />}
 						/>
 					</Container>
 				</Router>
