@@ -61,12 +61,6 @@ class AppNavBar extends Component {
 		const authLinks = (
 			<Fragment>
 				<NavItem>
-					<Link to="/user" className="nav-link text-link">
-						{' '}
-						Tracking{' '}
-					</Link>
-				</NavItem>
-				<NavItem>
 					<Link to="/settings" className="nav-link text-link">
 						<strong>{username}</strong>
 					</Link>
@@ -83,11 +77,25 @@ class AppNavBar extends Component {
 				<Navbar dark expand="sm" className="mb-5 navbar-style">
 					<Container>
 						<Link to="/" className="navbar-brand text-link work-sans">
-							<strong>Avise</strong>
+							<img src="/favicon1.ico" width="50" height="50" alt="" />
+							<strong> Avise</strong>
 						</Link>
 						<NavbarToggler onClick={this.toggle} />
 						<Collapse isOpen={this.state.isOpen} navbar>
 							<Nav className="mr-auto" navbar>
+								{this.props.isAuth ? (
+									<NavItem>
+										{' '}
+										<Link to="/user" className="nav-link text-link">
+											{' '}
+											Tracking{' '}
+										</Link>{' '}
+									</NavItem>
+								) : (
+									''
+								)}
+							</Nav>
+							<Nav className="navbar-right" navbar>
 								{this.props.isAuth ? authLinks : guestLinks}
 							</Nav>
 						</Collapse>
