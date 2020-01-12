@@ -28,7 +28,7 @@ from .serializers import (
 
 class AllowAnyForPostAndGetPermission(BasePermission):
     def has_permission(self, request, view):
-        if request.method in ["post", "get"]:
+        if request.method in ["POST", "GET"]:
             return True
 
         return request.user and request.user.is_authenticated
