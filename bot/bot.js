@@ -64,7 +64,7 @@ const mickeyVol = 375;
 
 
 
-let productList = ["beer", "beers", "wine", "weed", "mj", "drink", "drinks", "cigarette"];
+let productList = ["beer", "beers", "wine", "weed", "mj", "drink", "drinks", "cigarette", "refill", "vape"];
 let keywordsList = ["remove", "add", "set"];
 let argumentList = ["tall", "half", "sleeve", "sleeves", "pints", "pint", "bottle", "bottles", "double", "daily", "limit", "weekly", "mickey", "mickeys"];
 let volumeKeywordsList = ["millileters", "millileter", "ml", "L", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
@@ -473,6 +473,7 @@ changeInAlcohol = size;
             });
         break;
 
+        case "refill":
         case "vape":
             var tankSize;
             var strength;
