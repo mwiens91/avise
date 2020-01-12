@@ -92,9 +92,9 @@ var beerCount = 0;
 var dailyBeerLimit = 4*standardDrinkVol;
 var weeklyBeerLimit = 8;
 
-var wineCount = 0; 
-var dailyWineLimit = 4;
-var weeklyWineLimit = 8;
+// var wineCount = 0; 
+// var dailyWineLimit = 4;
+// var weeklyWineLimit = 8;
 
 let displayMetric = false;
 
@@ -139,6 +139,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     // 	return;
     // }
 
+console.log("Jayden: " + userID);
+
     // You don't want the bot to process messages that the bot itself sends.
     if(user == bot.username){ return};
 
@@ -171,8 +173,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
                 for(let j = 0; j < volumeKeywordsList.length; j++){
                     if(args[i + 1].toLowerCase() == volumeKeywordsList[j]){
-                        if(measure)
-                        measure = args[i + 1];
+                        measure = args[i + 1].toLowerCase;
                         size = parseFloat(args[i]);
                         break;
                     }
@@ -289,6 +290,16 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
             for(let i = 0; i < params.length; i++){
                 if(params[i] == "tall" || 
+                    params[i] == "millileters" ||
+                    params[i] == "millileter" ||
+                    params[i] == "ml" ||
+                    params[i] == "ounces" ||
+                    params[i] == "ounce" ||
+                    params[i] == "oz" ||
+                    params[i] == "oz." ||
+                    params[i] == "liters" ||
+                    params[i] == "liter" ||
+                    params[i] == "L" ||
                     params[i] == "pint"){
                     measure = params[i];
                 }
@@ -310,7 +321,11 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
             changeInAlcohol = size;
             totAlcoholVol += size;
-            api.submitAlcohol(userID, "beer", changeInAlcohol);
+            try{api.submitAlcohol(userID, "beer", changeInAlcohol);}
+            catch(error){
+
+            }
+            
             msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol,);
             bot.sendMessage({
                 to: channelID,
@@ -324,8 +339,24 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 if( params[i] == "bottle" ||
                     params[i] == "mickey" ||
                     params[i] == "mickeys" ||
+                    params[i] == "millileters" ||
+                    params[i] == "millileter" ||
+                    params[i] == "ml" ||
+                    params[i] == "ounces" ||
+                    params[i] == "ounce" ||
+                    params[i] == "oz" ||
+                    params[i] == "oz." ||
+                    params[i] == "liters" ||
+                    params[i] == "liter" ||
+                    params[i] == "L" ||
                     params[i] == "bottles"){
                     measure = params[i];
+                }
+                if(params[i] == "ounce" ||
+                    params[i] == "ounces" ||
+                    params[i] == "oz" ||
+                    params[i] == "oz."){
+                    measure = "ounce";
                 }
             }
 
@@ -338,7 +369,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             }
             changeInAlcohol = size;
             totAlcoholVol += size;
-            api.submitAlcohol(userID, "spirits", changeInAlcohol);
+            try{api.submitAlcohol(userID, "spirits", changeInAlcohol);}
+            catch(error){
+
+            }
             msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol,);
             bot.sendMessage({
                 to: channelID,
@@ -358,7 +392,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
 changeInAlcohol = size;
             totAlcoholVol += size;
-            api.submitAlcohol(userID, "beer", changeInAlcohol);
+            try{api.submitAlcohol(userID.toString(), "beer", changeInAlcohol);}
+            catch(error){
+
+            }
             msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol);
             bot.sendMessage({
                 to: channelID,
@@ -369,6 +406,16 @@ changeInAlcohol = size;
             for(let i = 0; i < params.length; i++){
                 if(
                     params[i] == "bottle" ||
+                    params[i] == "millileters" ||
+                    params[i] == "millileter" ||
+                    params[i] == "ml" ||
+                    params[i] == "ounces" ||
+                    params[i] == "ounce" ||
+                    params[i] == "oz" ||
+                    params[i] == "oz." ||
+                    params[i] == "liters" ||
+                    params[i] == "liter" ||
+                    params[i] == "L" ||
                     params[i] == "bottles"){
                     measure = params[i];
                 }
@@ -382,7 +429,10 @@ changeInAlcohol = size;
             }
             changeInAlcohol = size;
             totAlcoholVol += size;
-            api.submitAlcohol(userID, "wine", changeInAlcohol);
+            try{api.submitAlcohol(userID.toString(), "wine", changeInAlcohol);}
+            catch(error){
+
+            }
             msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol);
             bot.sendMessage({
                 to: channelID,
@@ -498,26 +548,26 @@ function alcoholConsumptionStringBuilder(user, volConsumed){
     }
     msgString += `${user} you've had ${drinks} drinks.`;
 
-    let limitRatio = volConsumed / dailyLimit;
-    dailyLimit = (dailyLimit/standardDrinkVol).toFixed(1);
-    if(limitRatio > 0.96 && limitRatio < 1.04){
-        msgString += " You have reached your daily drinking limit and should not continue drinking!";
-    }
-    else if(limitRatio >= 1.04 && limitRatio <= 1.4){
-        // user has drank ~20% past their limit.
-        msgString += " You have surpassed your daily drinking limit! Your liver is crying and would like you to please stop ;-; ";
-    }
-    else if(limitRatio > 1.4 ){
-        // drank 40% more than they've wanted to.
-        msgString += " You have greatly surpassed your daily drinking limit! Future 'you' is going to be very disappointed.";
-    }
-    else if(limitRatio <= 0.96 && limitRatio >= 0.80){
-        msgString += ` You are over 80% of the way toward your daily limit of ${dailyLimit} drinks.`;
-    }
-    else if(limitRatio < 0.80){
-        msgString += ` You are ${limitRatio.toFixed(2)* 100}% of the way to your desired daily beer limit of ${dailyLimit} drinks.`;
-    }
+    // let limitRatio = volConsumed / dailyLimit;
+    // dailyLimit = (dailyLimit/standardDrinkVol).toFixed(1);
+    // if(limitRatio > 0.96 && limitRatio < 1.04){
+    //     msgString += " You have reached your daily drinking limit and should not continue drinking!";
+    // }
+    // else if(limitRatio >= 1.04 && limitRatio <= 1.4){
+    //     // user has drank ~20% past their limit.
+    //     msgString += " You have surpassed your daily drinking limit! Your liver is crying and would like you to please stop ;-; ";
+    // }
+    // else if(limitRatio > 1.4 ){
+    //     // drank 40% more than they've wanted to.
+    //     msgString += " You have greatly surpassed your daily drinking limit! Future 'you' is going to be very disappointed.";
+    // }
+    // else if(limitRatio <= 0.96 && limitRatio >= 0.80){
+    //     msgString += ` You are over 80% of the way toward your daily limit of ${dailyLimit} drinks.`;
+    // }
+    // else if(limitRatio < 0.80){
+    //     msgString += ` You are ${limitRatio.toFixed(2)* 100}% of the way to your desired daily beer limit of ${dailyLimit} drinks.`;
+    // }
 
-    console.log(`RETURN STRING: ${msgString}`);
+    // console.log(`RETURN STRING: ${msgString}`);
     return msgString;
 }
