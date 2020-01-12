@@ -48,7 +48,11 @@ class AppNavBar extends Component {
 					<LoginModal login={this.login} error={this.props.error} clearErrors={this.clearErrors} />
 				</NavItem>
 				<NavItem>
-					<RegisterModal register={this.register} />
+					<RegisterModal
+						register={this.register}
+						error={this.props.error}
+						clearErrors={this.clearErrors}
+					/>
 				</NavItem>
 			</Fragment>
 		);
@@ -57,8 +61,13 @@ class AppNavBar extends Component {
 		const authLinks = (
 			<Fragment>
 				<NavItem>
-					{/* Need to change the link to be the username */}
 					<Link to="/user" className="nav-link text-link">
+						{' '}
+						Tracking{' '}
+					</Link>
+				</NavItem>
+				<NavItem>
+					<Link to="/settings" className="nav-link text-link">
 						<strong>{username}</strong>
 					</Link>
 				</NavItem>
@@ -78,7 +87,7 @@ class AppNavBar extends Component {
 						</Link>
 						<NavbarToggler onClick={this.toggle} />
 						<Collapse isOpen={this.state.isOpen} navbar>
-							<Nav className="ml-auto" navbar>
+							<Nav className="mr-auto" navbar>
 								{this.props.isAuth ? authLinks : guestLinks}
 							</Nav>
 						</Collapse>
