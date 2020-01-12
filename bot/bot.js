@@ -4,14 +4,12 @@ import Api from './api';
 var Discord = require('discord.io');
 var logger = require('winston');
 
-// Load in env vars from .env file and store them in variables
+// Load in env vars from .env file and grab Discord API token
 dotenv.config();
 const discordApiToken = process.env.DISCORD_API_TOKEN;
-const aviseApiToken = process.env.AVISE_API_TOKEN;
-const aviseApiUrl = process.env.AVISE_API_URL;
 
 // Initialize Api instance
-const api = new Api(aviseApiUrl, aviseApiToken);
+const api = new Api('fake news', 'fake news');
 
 console.log("Starting Bot");
 logger.remove(logger.transports.Console);
@@ -62,7 +60,7 @@ const bottleWineVol = 750;
 
 
 
-let productList = ["beer", "beers", "shot", "shots", "wine", "weed", "mj"];
+let productList = ["beer", "beers", "wine", "weed", "mj", "drink", "drinks"];
 let keywordsList = ["remove", "add", "set"];
 let argumentList = ["tall", "half", "sleeve", "sleeves", "pints", "pint", "bottle", "bottles", "double"];
 let volumeKeywordsList = ["millileters", "millileter", "ml", "L", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
@@ -75,7 +73,7 @@ var beer = ["beer", "beers", "wine", "spirit", "pbr", "pabst", "pabst blue ribbo
 
 var wine = ["wine", "red", "white"];
 
-var spirits = ["shot", "vodka", "whiskey", "tequila", "shooter", "rum", 
+var spirits = ["shot", "shots", "vodka", "whiskey", "tequila", "shooter", "rum", 
     "gin", "brandy", "absinthe", "drink", "margarita", "champagne", "prosecco", "cider",
     "sake"];
 
@@ -238,6 +236,25 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     			}
     		}
 
+            if(!exitFlag){
+                if(beer.includes(args[i])){
+                    // The token matched a type of beer
+                    cmd = "beer";
+                }
+            }
+            if(!exitFlag){
+                if(spirits.includes(args[i])){
+                    // The token matched a type of beer
+                    cmd = "spirit";
+                }
+            }
+            if(!exitFlag){
+                if(wine.includes(args[i])){
+                    // The token matched a type of beer
+                    cmd = "wine";
+                }
+            }
+
     	}
     }
 
@@ -280,8 +297,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 message: msgStr
             });
         break;
-        case "shot":
-        case "shots":
+        case "spirit":
 
             for(let i = 0; i < params.length; i++){
                 if(params[i] == "double" || 
@@ -292,7 +308,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             }
 
             console.log(`Amount: ${amount}, Product: ${cmd}, Keyword: ${keyword}, Measure: ${measure}, Size: ${size}` );
-            size = calcVolAlc(size, measure, amount, "shot");
+            size = calcVolAlc(size, measure, amount, "spirit");
 
             if(keyword == "remove"){
                     // User probably made a mistake and wants to remove that amount of liquor from the record.
@@ -301,7 +317,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
             totAlcoholVol += size;
             
-            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol, "shot");
+            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol, "spirit");
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
@@ -427,7 +443,7 @@ function calcVolAlc(size, measure, amount, product){
         if(product == "beer"){
             size = beerVol;
         }
-        else if(product == "shot"){
+        else if(product == "spirit"){
             size = shotVol;
         }
         else if(product == "wine"){
@@ -446,7 +462,7 @@ function calcVolAlc(size, measure, amount, product){
     if(product == "beer"){
         size *= avgBeerPercent;
     }
-    else if(product == "shot"){
+    else if(product == "spirit"){
         size *= avgSpiritPercent;
     }
     else if(product == "wine"){
