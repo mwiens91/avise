@@ -42,3 +42,17 @@ class UserReadOnlySerializer(serializers.ModelSerializer):
             "last_login",
             "is_staff",
         )
+
+
+class UserWriteSerializer(serializers.ModelSerializer):
+    """A write serializer for a user."""
+
+    class Meta:
+        model = User
+        fields = (
+            "email",
+            "username",
+            "password",
+            "track_nicotine",
+            "track_alcohol",
+        )

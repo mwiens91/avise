@@ -7,7 +7,7 @@ from rest_framework import viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.decorators import api_view
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -20,7 +20,16 @@ from .serializers import (
     DataPointAlcoholSerializer,
     DataPointNicotineSerializer,
     UserReadOnlySerializer,
+    UserWriteSerializer,
 )
+
+
+class AllowAnyForPostAndGetPermission(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in ["post", "get"]:
+            return True
+
+        return request.user and request.user.is_authenticated
 
 
 @swagger_auto_schema(
@@ -69,10 +78,16 @@ class ObtainAuthTokenView(APIView):
 class UserViewSet(viewsets.ModelViewSet):
     """A viewset for users."""
 
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method in ("post", "patch"):
+            return UserWriteSerializer
+
+        return UserReadOnlySerializer
+
     queryset = User.objects.all()
     lookup_field = "username"
-    http_method_names = ["get"]
-    serializer_class = UserReadOnlySerializer
+    http_method_names = ["get", "post", "patch"]
+    permission_classes = (AllowAnyForPostAndGetPermission,)
 
 
 class DataPointAlcoholViewSet(viewsets.ModelViewSet):
