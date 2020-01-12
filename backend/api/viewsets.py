@@ -79,7 +79,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """A viewset for users."""
 
     def get_serializer_class(self, *args, **kwargs):
-        if self.request.method in ("post", "patch"):
+        if self.request.method in ("POST", "PATCH"):
             return UserWriteSerializer
 
         return UserReadOnlySerializer
