@@ -7,7 +7,7 @@ class Home extends Component {
 	render() {
 		return (
 			<div>
-				<Jumbotron>
+				<Jumbotron className="jumbo-color">
 					<h1 className="display-3 work-sans">Avise</h1>
 					<p className="lead">
 						Inform people on the impacts of their substance use and help them reach whatever goals

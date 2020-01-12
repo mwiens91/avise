@@ -25,7 +25,7 @@ class Settings extends Component {
 		}
 		const currentVape = (
 			<Fragment>
-				<Card>
+				<Card className="mb-3">
 					<CardBody>
 						<Row>
 							<Col>
@@ -47,7 +47,7 @@ class Settings extends Component {
 		);
 		const setVape = (
 			<Fragment>
-				<Card>
+				<Card className="mb-3">
 					<CardBody>
 						<Row>
 							<Col>
@@ -68,7 +68,7 @@ class Settings extends Component {
 
 		const preferences = (
 			<Fragment>
-				<Card>
+				<Card className="mb-3">
 					<CardBody>
 						<Row>
 							<Col>
