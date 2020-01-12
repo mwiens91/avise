@@ -101,6 +101,10 @@ var dailyCigaretteLimit = 20;
 var weeklyCigaretteLimit = 140;
 var cigaretteToWater = 0;
 
+var vapeMgNicotineCount = 0;
+var dailyNicotineLimit = 20;
+var weeklyNicotineLimit = 140;
+
 let displayMetric = false;
 
 
@@ -467,9 +471,31 @@ changeInAlcohol = size;
                 message: msgStr
             });
         break;
-    }
 
-       		
+        case "vape":
+            var tankSize;
+            var strength;
+
+            userVapeStats = [tankSize, strength]
+            userVapeStats = api.getUserVape(discordId);
+
+            amount = parseInt(amount, 10);
+
+            if(keyword == "remove"){
+                    // User probably made a mistake and wants to remove that amount of vape juice from the record.
+                    amount *= -1;
+            }
+            amountNicotine = (amount*userVapeStats[1]*tankSize)
+            vapeMgNicotineCount += amountNicotine;
+            api.submitNicotine(userID, "vape", amountNicotine);
+
+            msgStr = vapeStringBuilder(user, amountNicotine);
+            bot.sendMessage({
+                to: channelID,
+                message: msgStr
+            });        
+            break
+    }      		
 });
 
 
@@ -634,6 +660,40 @@ function cigaretteStringBuilder(user, amountSmoked){
         else{
             msgString += "cigarettes.";
         }
+    }
+
+    console.log(`RETURN STRING: ${msgString}`);
+    return msgString;
+}
+
+function vapeStringBuilder(user, amountSmoked){
+    let msgString = "";
+    let dailyLimit = dailyCigaretteLimit;
+    let weeklyLimit = weeklyCigaretteLimit;
+    let count = amountSmoked;
+
+    msgString += `${user} you've inhaled ${count} `;
+
+    if(count == 1){
+        msgString += "mg of nicotine.";
+    }
+    else{
+        msgString += "mgs of nicotine.";
+    }
+
+    if(dailyLimit - count == 0){
+        msgString += " You have reached your daily nicotine limit and should not continue vaping!";
+    }
+    else if(dailyLimit - count == -1){
+        // user has smoked 1 cigarette past their limit.
+        msgString += " You have surpassed your daily vaping limit!";
+    }
+    else if(dailyLimit - count < -1){
+        // user has smoked 1 cigarette past their limit.
+        msgString += " You have greatly surpassed your daily vaping limit! Future 'you' is going to be very disappointed.";
+    }
+    else if(dailyLimit - count <= 2){
+        msgString += " You are nearing your desired daily nicotine limit.";
     }
 
     console.log(`RETURN STRING: ${msgString}`);
