@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import { Collapse, Navbar, NavbarToggler, Nav, NavItem, Container, NavLink } from 'reactstrap';
+import { Collapse, Navbar, NavbarToggler, Nav, NavItem, Container } from 'reactstrap';
 import LoginModal from './auth/LoginModal';
 import RegisterModal from './auth/RegisterModal';
 import '../css/App.css';
@@ -24,10 +24,12 @@ class AppNavBar extends Component {
 		this.props.logout();
 	};
 
-	register = (data) => {
-		const { username, email, password, confirm_password } = data;
+	clearErrors = () => {
+		this.props.clearErrors();
+	};
 
-		// Make API request here, validate data and return errors when needed
+	register = (data) => {
+		this.props.register(data);
 	};
 
 	componentDidMount() {
@@ -43,7 +45,7 @@ class AppNavBar extends Component {
 		const guestLinks = (
 			<Fragment>
 				<NavItem>
-					<LoginModal login={this.login} />
+					<LoginModal login={this.login} error={this.props.error} clearErrors={this.clearErrors} />
 				</NavItem>
 				<NavItem>
 					<RegisterModal register={this.register} />

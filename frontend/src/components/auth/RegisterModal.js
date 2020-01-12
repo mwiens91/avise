@@ -9,6 +9,7 @@ import {
 	Label,
 	Input,
 	NavLink,
+	Alert,
 } from 'reactstrap';
 import '../../css/App.css';
 
@@ -35,13 +36,14 @@ class RegisterModal extends Component {
 	onSubmit = (e) => {
 		e.preventDefault();
 
-		const { username, email, password, confirm_password } = this.state;
+		// TODO: Need to do data validation here
+		// confirm password
+		const { username, email, password } = this.state;
 
 		const data = {
-			username,
 			email,
+			username,
 			password,
-			confirm_password,
 		};
 
 		this.props.register(data);
@@ -56,6 +58,7 @@ class RegisterModal extends Component {
 				<Modal isOpen={this.state.modal} toggle={this.toggle}>
 					<ModalHeader toggle={this.toggle}>Register</ModalHeader>
 					<ModalBody>
+						{this.props.error && <Alert color="danger">{this.props.error}</Alert>}
 						<Form onSubmit={this.onSubmit}>
 							<FormGroup>
 								<Label for="username">Username</Label>

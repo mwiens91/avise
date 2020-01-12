@@ -9,6 +9,7 @@ import {
 	Label,
 	Input,
 	NavLink,
+	Alert,
 } from 'reactstrap';
 
 class LoginModal extends Component {
@@ -26,6 +27,7 @@ class LoginModal extends Component {
 		this.setState({
 			modal: !this.state.modal,
 		});
+		this.props.clearErrors();
 	};
 
 	onChange = (e) => {
@@ -40,12 +42,13 @@ class LoginModal extends Component {
 			username,
 			password,
 		};
-		console.log('from loginmodal' + data);
 
 		this.props.login(data);
 
-		// Should only toggle if login is successful
-		this.toggle();
+		if (this.props.error !== '') {
+			// Should only toggle if login is successful
+			this.toggle();
+		}
 	};
 
 	render() {
@@ -57,6 +60,7 @@ class LoginModal extends Component {
 				<Modal isOpen={this.state.modal} toggle={this.toggle}>
 					<ModalHeader toggle={this.toggle}>Login</ModalHeader>
 					<ModalBody>
+						{this.props.error && <Alert color="danger">{this.props.error}</Alert>}
 						<Form onSubmit={this.onSubmit}>
 							<FormGroup>
 								<Label for="username">Username</Label>

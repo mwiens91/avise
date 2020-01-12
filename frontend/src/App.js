@@ -14,15 +14,29 @@ class App extends Component {
 	state = {
 		isAuth: false,
 		user: null,
+		error: '',
 	};
 
 	Api = new Api(process.env.REACT_APP_API_URL);
 
 	login = async (data) => {
-		const tokenJson = await this.Api.getApiTokenWithBasicAuth(data);
-		localStorage.setItem('token', tokenJson.token);
+		try {
+			const tokenJson = await this.Api.getApiTokenWithBasicAuth(data);
+			this.setUserLogin(tokenJson.token);
+		} catch (e) {
+			console.log('from app');
+			this.setState({ error: 'Failed login. Try again' });
+		}
+	};
 
-		this.Api.setToken(tokenJson.token);
+	clearErrors = () => {
+		this.setState({ error: '' });
+	};
+
+	setUserLogin = async (token) => {
+		localStorage.setItem('token', token);
+
+		this.Api.setToken(token);
 
 		try {
 			const user = await this.Api.getUserFromApiToken();
@@ -47,12 +61,34 @@ class App extends Component {
 		localStorage.setItem('user', null);
 	};
 
+	register = async (data) => {
+		try {
+			await this.Api.createUser(data);
+			const userData = {
+				username: data.username,
+				password: data.password,
+			};
+			this.login(userData);
+		} catch (e) {
+			console.log('from app');
+			this.setState({ error: 'Failed to create user.' });
+		}
+	};
+
 	render() {
-		const { isAuth, user } = this.state;
+		const { isAuth, user, error } = this.state;
 		return (
 			<div>
 				<Router>
-					<AppNavBar isAuth={isAuth} user={user} login={this.login} logout={this.logout} />
+					<AppNavBar
+						isAuth={isAuth}
+						user={user}
+						login={this.login}
+						logout={this.logout}
+						error={error}
+						clearErrors={this.clearErrors}
+						register={this.register}
+					/>
 					<Container>
 						<Route exact path="/" component={Home} />
 						<Route
