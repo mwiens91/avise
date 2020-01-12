@@ -58,6 +58,20 @@ class Api {
 				players.filter((p) => p.is_active).sort((p1, p2) => p1.rating < p2.rating).slice(0, nMax)
 			)
 			.catch((error) => error);
+
+	createUser = (userData) =>
+		fetch(`${this.baseApiUrl}/users/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(userData),
+		}).then((response) => {
+			if (!response.ok) {
+				throw Error(response.statusText);
+			}
+			return response.json();
+		});
 }
 
 export default Api;
