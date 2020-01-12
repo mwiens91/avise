@@ -16,8 +16,6 @@ import {
 class Substance extends Component {
 	state = {};
 	render() {
-		// console.log(this.props.substances);
-
 		return (
 			<div>
 				<Card className="mb-3">
