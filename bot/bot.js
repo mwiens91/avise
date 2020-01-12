@@ -44,9 +44,10 @@ class user {
 }
 
 const ounceToMili = 29.5735;
-const avgBeerPercent = 0.045;
-const avgWinePercent = 0.116;
+const avgBeerPercent = 0.05;
+const avgWinePercent = 0.12;
 const avgSpiritPercent = 0.40;
+const standardDrinkVol = 17.7; //17.2ml of 100% alcohol is considered a "standard drink". This is roughly 12oz of 5% beer, 1.5 ounces of 40% liqour, or 5 ounces of 12% wine.
 
 //default values in ml
 const defaultWineVol = 175; 
@@ -85,9 +86,9 @@ var cigarette = ["cigarette", "cig", "cug", "smoke", "dart", "buck", "cigarettes
 var marijuana = ["joint", "thai stick", "j", "spliff", "pinner", "fatty", "bowl", "blunt"];
 
 
-let totAlcoholVol;
+let totAlcoholVol = 0;
 var beerCount = 0; 
-var dailyBeerLimit = 4;
+var dailyBeerLimit = 4*standardDrinkVol;
 var weeklyBeerLimit = 8;
 
 var wineCount = 0; 
@@ -255,16 +256,17 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     measure = "sleeve";
                 }
             }
+            console.log(`Amount: ${amount}, Product: ${cmd}, Keyword: ${keyword}, Measure: ${measure}, Size: ${size}` );
             size = calcVolAlc(size, measure, amount, "beer");
 
             if(keyword == "remove"){
                     // User probably made a mistake and wants to remove that amount of liquor from the record.
-                    amount *= -1;
+                    size *= -1;
             }
 
             totAlcoholVol += size;
             
-            msgStr = beerStringBuilder(user);
+            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol, "beer");
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
@@ -283,12 +285,12 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
             if(keyword == "remove"){
                     // User probably made a mistake and wants to remove that amount of liquor from the record.
-                    amount *= -1;
+                    size *= -1;
             }
 
             totAlcoholVol += size;
             
-            msgStr = wineStringBuilder(user);
+            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol, "wine");
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
@@ -301,13 +303,18 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
 
 function calcVolAlc(size, measure, amount, product){
+    console.log(`START: Amount: ${amount}, Product: ${product}, Measure: ${measure}, Size: ${size}`);
+
     if(amount == undefined){
         // An amount wasn't specified, but we're going to assume they meant they had 1 drink.
         amount = 1;
     }
     
     amount = parseInt(amount, 10);
-    size = parseInt(size, 10);
+
+    if(size != undefined){
+        size = parseInt(size, 10);// could be undef
+    }
 
     // Got to determine the quantity of alcohol consumed. Everything will be converted to millileters.
     if( measure == "millileters"    ||
@@ -363,6 +370,7 @@ function calcVolAlc(size, measure, amount, product){
     }
 
     // merge size with amount
+    console.log(`MID END: Amount: ${amount}, Product: ${product}, Measure: ${measure}, Size: ${size}`);
     size = size * amount;
 
     // calculate ml of pure alcohol
@@ -377,87 +385,118 @@ function calcVolAlc(size, measure, amount, product){
     }
 
     // return value is 100% alcohol in ml
+    console.log(`END: Amount: ${amount}, Product: ${product}, Measure: ${measure}, Size: ${size}`);
     return size;
 }
 
-
-
-function beerStringBuilder(user){
-	let msgString = "";
-	let dailyLimit = dailyBeerLimit;
-	let weeklyLimit = weeklyBeerLimit;
-	let count = beerCount;
-
-    msgString += `${user} you've drank ${count} `;
-
-	if(count == 1){
-		msgString += "beer.";
-	}
-	else{
-		msgString += "beers.";
-	}
-
-	if(dailyLimit - count == 0){
-		msgString += " You have reached your daily drinking limit and should not continue drinking!";
-	}
-	else if(dailyLimit - count == -1){
-		// user has drank 1 beer past their limit.
-		msgString += " You have surpassed your daily drinking limit! Your liver is crying and would like you to please stop ;-; ";
-	}
-	else if(dailyLimit - count < -1){
-		// user has drank 1 beer past their limit.
-		msgString += " You have greatly surpassed your daily drinking limit! Future 'you' is going to be very disappointed.";
-	}
-	else if(dailyLimit - count <= 2){
-		msgString += ` You are nearing your desired daily beer limit of ${dailyLimit} `;
-		if(dailyLimit == 1){
-			msgString += "beer.";
-		}
-		else{
-			msgString += "beers.";
-		}
-	}
-
-	console.log(`RETURN STRING: ${msgString}`);
-	return msgString;
-}
-
-function wineStringBuilder(user){
+function alcoholConsumptionStringBuilder(user, volConsumed, product){
     let msgString = "";
-    let dailyLimit = dailyWineLimit;
-    let weeklyLimit = weeklyWineLimit;
-    let count = wineCount;
+    let dailyLimit = dailyBeerLimit; //dailyLimit in ml
+    // let weeklyLimit = weeklyBeerLimit;
 
-    msgString += `${user} you've drank ${count} `;
+    let drinks = (volConsumed / standardDrinkVol).toFixed(1);
+    msgString += `${user} you've had ${drinks} drinks.`;
 
-    if(count == 1){
-        msgString += "glass of wine.";
-    }
-    else{
-        msgString += "glasses of wine.";
-    }
-
-    if(dailyLimit - count == 0){
+    let limitRatio = volConsumed / dailyLimit;
+    dailyLimit = (dailyLimit/standardDrinkVol).toFixed(1);
+    if(limitRatio > 0.96 && limitRatio < 1.04){
         msgString += " You have reached your daily drinking limit and should not continue drinking!";
     }
-    else if(dailyLimit - count == -1){
-        // user has drank 1 beer past their limit.
+    else if(limitRatio >= 1.04 && limitRatio <= 1.4){
+        // user has drank ~20% past their limit.
         msgString += " You have surpassed your daily drinking limit! Your liver is crying and would like you to please stop ;-; ";
     }
-    else if(dailyLimit - count < -1){
-        // user has drank 1 beer past their limit.
+    else if(limitRatio > 1.4 ){
+        // drank 40% more than they've wanted to.
         msgString += " You have greatly surpassed your daily drinking limit! Future 'you' is going to be very disappointed.";
     }
-    else if(dailyLimit - count <= 2){
-        msgString += ` You are nearing your desired daily alcohol limit of ${dailyLimit} `;
-        if(dailyLimit == 1){
-            msgString += "glass of wine.";
-        }
-        else{
-            msgString += "glasses of wine.";
-        }
+    else if(limitRatio <= 0.96 && limitRatio >= 0.80){
+        msgString += ` You are over 80% of the way toward your daily limit of ${dailyLimit} drinks.`;
+    }
+    else if(limitRatio < 0.80){
+        msgString += ` You are ${limitRatio.toFixed(2)* 100}% of the way to your desired daily beer limit of ${dailyLimit} drinks.`;
     }
 
     console.log(`RETURN STRING: ${msgString}`);
     return msgString;
 }
+
+// function beerStringBuilder(user){
+// 	let msgString = "";
+// 	let dailyLimit = dailyBeerLimit;
+// 	let weeklyLimit = weeklyBeerLimit;
+// 	let count = beerCount;
+
+//     msgString += `${user} you've drank ${count} `;
+
+// 	if(count == 1){
+// 		msgString += "beer.";
+// 	}
+// 	else{
+// 		msgString += "beers.";
+// 	}
+
+// 	if(dailyLimit - count == 0){
+// 		msgString += " You have reached your daily drinking limit and should not continue drinking!";
+// 	}
+// 	else if(dailyLimit - count == -1){
+// 		// user has drank 1 beer past their limit.
+// 		msgString += " You have surpassed your daily drinking limit! Your liver is crying and would like you to please stop ;-; ";
+// 	}
+// 	else if(dailyLimit - count < -1){
+// 		// user has drank 1 beer past their limit.
+// 		msgString += " You have greatly surpassed your daily drinking limit! Future 'you' is going to be very disappointed.";
+// 	}
+// 	else if(dailyLimit - count <= 2){
+// 		msgString += ` You are nearing your desired daily beer limit of ${dailyLimit} `;
+// 		if(dailyLimit == 1){
+// 			msgString += "beer.";
+// 		}
+// 		else{
+// 			msgString += "beers.";
+// 		}
+// 	}
+
+// 	console.log(`RETURN STRING: ${msgString}`);
+// 	return msgString;
+// }
+
+// function wineStringBuilder(user){
+//     let msgString = "";
+//     let dailyLimit = dailyWineLimit;
+//     let weeklyLimit = weeklyWineLimit;
+//     let count = wineCount;
+
+//     msgString += `${user} you've drank ${count} `;
+
+//     if(count == 1){
+//         msgString += "glass of wine.";
+//     }
+//     else{
+//         msgString += "glasses of wine.";
+//     }
+
+//     if(dailyLimit - count == 0){
+//         msgString += " You have reached your daily drinking limit and should not continue drinking!";
+//     }
+//     else if(dailyLimit - count == -1){
+//         // user has drank 1 beer past their limit.
+//         msgString += " You have surpassed your daily drinking limit! Your liver is crying and would like you to please stop ;-; ";
+//     }
+//     else if(dailyLimit - count < -1){
+//         // user has drank 1 beer past their limit.
+//         msgString += " You have greatly surpassed your daily drinking limit! Future 'you' is going to be very disappointed.";
+//     }
+//     else if(dailyLimit - count <= 2){
+//         msgString += ` You are nearing your desired daily alcohol limit of ${dailyLimit} `;
+//         if(dailyLimit == 1){
+//             msgString += "glass of wine.";
+//         }
+//         else{
+//             msgString += "glasses of wine.";
+//         }
+//     }
+
+//     console.log(`RETURN STRING: ${msgString}`);
+//     return msgString;
+// }
