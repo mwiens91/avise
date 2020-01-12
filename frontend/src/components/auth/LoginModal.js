@@ -36,8 +36,13 @@ class LoginModal extends Component {
 		e.preventDefault();
 
 		const { username, password } = this.state;
+		const data = {
+			username,
+			password,
+		};
+		console.log('from loginmodal' + data);
 
-		this.props.login(username, password);
+		this.props.login(data);
 
 		// Should only toggle if login is successful
 		this.toggle();
