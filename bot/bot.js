@@ -45,6 +45,7 @@ class user {
 let productList = ["beer", "beers", "shot", "shots", "wine", "weed", "mj"];
 let keywordsList = ["remove", "add", "set"];
 let argumentList = ["tall", "half", "glass", "of"];
+let volumnKeywordsList = ["millileters", "millileter", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
 
 
 var beer = ["beer", "beers", "wine", "spirit", "pbr", "pabst", "pabst blue ribbon",
@@ -66,27 +67,22 @@ var cigarette = ["cigarette", "cig", "cug", "smoke", "dart", "buck", "cigarettes
 
 var marijuana = ["joint", "thai stick", "j", "spliff", "pinner", "fatty", "bowl", "blunt"];
 
-var alcohol = ["beer", "beers", "wine", "spirit", "pbr", "pabst", "pabst blue ribbon",
-    "heineken", "brewski", "ber", "bere", "sleeman", "cariboo", "sleeve",
-    "corona", "asahi", "miller", "coors", "guinness", "dos equis", "bud", 
-    "busch", "bud light", "coors light", "miller high life", "moosehead",
-    "wine", "red", "white", "shot", "vodka", "whiskey", "tequila", "shooter", "rum", 
-    "gin", "brandy", "absinthe", "drink", "margarita", "champagne", "prosecco", "cider",
-    "sake", "mead"];
-
-var cigarette = ["cigarette", "cig", "cug", "smoke", "dart", "buck", "cigarettes",
-    "belmont", "pall mall", "dumaurier", "du maurier", "fag", "smokes", "smoks", "smok",
-    "bogey", "durry", "fags", "square"]
-
-var marijuana = ["joint", "thai stick", "j", "spliff", "pinner", "fatty", "bowl", "blunt"]
-
 
 
 var beerCount = 0; 
 var dailyBeerLimit = 4;
 var weeklyBeerLimit = 8;
 
+var wineCount = 0; 
+var dailyWineLimit = 4;
+var weeklyWineLimit = 8;
+
 const normalToTall = 1.25
+
+let displayMetric = false;
+
+
+// TODO: display setting. Display in either ml or ounces
 // Configure logger settings
 
 
@@ -138,8 +134,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
     var args = message.split(' ');
     let amount;
-    let product;
+    let cmd;
     let params = [];
+    let volumn;
+    let size;
     let keyword; // Set, Remove, add, 
 
     // General command format:
@@ -152,7 +150,18 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
     	console.log(!isNaN(args[i]));
     	if(!isNaN(args[i])){
-    		// An amount was specified
+    		// An amount was specified or potentially an amount of ounces/millileters/liters
+
+            if(args.length > i + 1){
+                // I want to access the next element, so make sure we're not at the end of the array first.
+
+                for(let j = 0; j < volumnKeywordsList.length; j++){
+                    if(args[i + 1] == volumnKeywordsList[j]){
+                        volumn = args[i + 1];
+                        size = parseInt(args[i]);
+                    }
+                }
+            }
 
     		if(amount !== undefined){
     			// Amount was specified more than once. Throw an error.
@@ -164,7 +173,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     	else{
     		// argument is some kind of word. Try to determine the type.
 
-    		exitFlag = false;
+    		let exitFlag = false;
     		for(let j = 0; j < productList.length; j++){
     			if(productList[j] === args[i]){
     				// Found a match. Argument was the product to track.
@@ -195,7 +204,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     			for(let j = 0; j < keywordsList.length; j++){
 	    			if(keywordsList[j] === args[i]){
 	    				// Found a match. Argument was a keyword
-	    				params.push(args[i]);
+	    				keyword = args[i];
 
 	    				// We've found a match, so no need to continue looking
 	    				exitFlag = true;
@@ -208,11 +217,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     	}
     }
 
-    console.log("Finished parsing the command.");
-    console.log(`Amount: ${amount}, Product: ${product}, Params: ${params}, Keyword: ${keyword}`);
-
     // Message has been fully parsed. Now use the data to construct the command + return message
+     console.log(`Amount: ${amount}, Product: ${cmd}, Params: ${params}, Keyword: ${keyword}, Volumn: ${volumn}`);
 
+    let msgStr;
     switch(cmd){
         case "beer":
         console.log("beginning printing.");
@@ -230,9 +238,42 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 }
             }
 
+            if(keyword == "remove"){
+                    // User probably made a mistake and wants to remove that amount of liquor from the record.
+                    amount *= -1;
+            }
+
             beerCount += amount;
             
-            let msgStr = beerStringBuilder(user);
+            msgStr = beerStringBuilder(user);
+            bot.sendMessage({
+                to: channelID,
+                message: msgStr
+            });
+        break;
+        case "wine":
+
+            if(amount == undefined){
+                // An amount wasn't specified, but we're going to assume they meant they drank 1 beer.
+                amount = 1;
+            }
+
+            amount = parseInt(amount, 10);
+
+            for(let i = 0; i < params.length; i++){
+                if(params[i] == "half"){
+                    amount *= 0.5;
+                }
+            }
+
+            if(keyword == "remove"){
+                    // User probably made a mistake and wants to remove that amount of liquor from the record.
+                    amount *= -1;
+            }
+
+            wineCount += amount;
+            
+            msgStr = wineStringBuilder(user);
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
@@ -244,6 +285,42 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 });
 
 
+function calcVolAlc(size, measure, amount, product){
+    if(amount == undefined){
+        // An amount wasn't specified, but we're going to assume they meant they had 1 drink.
+        amount = 1;
+    }
+    
+    amount = parseInt(amount, 10);
+
+    // Got to determine the quantity of alcohol consumed. Everything will be converted to millileters.
+    if( measure == "millileters"    ||
+        measure == "millileter"){
+
+    }
+
+    // for(let i = 0; i < params.length; i++){
+    //     if(params[i] == "tall"){
+    //         amount *= normalToTall;
+    //     }
+    // }
+
+    // if(keyword == "remove"){
+    //         // User probably made a mistake and wants to remove that amount of liquor from the record.
+    //         amount *= -1;
+    // }
+
+    // beerCount += amount;
+    
+    // msgStr = beerStringBuilder(user);
+    // bot.sendMessage({
+    //     to: channelID,
+    //     message: msgStr
+    // });
+
+
+}
+
 
 
 function beerStringBuilder(user){
@@ -251,8 +328,6 @@ function beerStringBuilder(user){
 	let dailyLimit = dailyBeerLimit;
 	let weeklyLimit = weeklyBeerLimit;
 	let count = beerCount;
-
-	console.log(`DAILY LIMIT: ${dailyLimit}, ${weeklyLimit}, ${count}.`);
 
     msgString += `${user} you've drank ${count} `;
 
@@ -263,7 +338,6 @@ function beerStringBuilder(user){
 		msgString += "beers.";
 	}
 
-	console.log(`DAILY LIMIT: ${dailyLimit - count == -1}`);
 	if(dailyLimit - count == 0){
 		msgString += " You have reached your daily drinking limit and should not continue drinking!";
 	}
@@ -289,56 +363,42 @@ function beerStringBuilder(user){
 	return msgString;
 }
 
+function wineStringBuilder(user){
+    let msgString = "";
+    let dailyLimit = dailyWineLimit;
+    let weeklyLimit = weeklyWineLimit;
+    let count = wineCount;
 
-// function loggerStringBuilder(product, user){
-// 	let msgString = "";
-// 	let dailyLimit;
-// 	let weeklyLimit;
-// 	let count;
-// 	let productSing;
-// 	let productPlur;
+    msgString += `${user} you've drank ${count} `;
 
-// 	if(product == "beer"){
-// 		dailyLimit = dailyBeerLimit;
-// 		weeklyLimit = weeklyBeerLimit;
-// 		count = beerCount;
-// 		productPlur = "beers";
-// 		productSing = "beer";
-// 	}
-// 	else if(product == "nicotine"){
-// 		// TODO: 
-// 	}
+    if(count == 1){
+        msgString += "glass of wine.";
+    }
+    else{
+        msgString += "glasses of wine.";
+    }
 
-//     msgString += `${user} you've `;
-//    	if(product == "beer"){
-//    		msgString += "drank ";
-//    	}
+    if(dailyLimit - count == 0){
+        msgString += " You have reached your daily drinking limit and should not continue drinking!";
+    }
+    else if(dailyLimit - count == -1){
+        // user has drank 1 beer past their limit.
+        msgString += " You have surpassed your daily drinking limit! Your liver is crying and would like you to please stop ;-; ";
+    }
+    else if(dailyLimit - count < -1){
+        // user has drank 1 beer past their limit.
+        msgString += " You have greatly surpassed your daily drinking limit! Future 'you' is going to be very disappointed.";
+    }
+    else if(dailyLimit - count <= 2){
+        msgString += ` You are nearing your desired daily alcohol limit of ${dailyLimit} `;
+        if(dailyLimit == 1){
+            msgString += "glass of wine.";
+        }
+        else{
+            msgString += "glasses of wine.";
+        }
+    }
 
-//     msgString += `${count} `;
-// 	if(count == 1){
-// 		msgString += `${productSing}.`;
-// 	}
-// 	else{
-// 		msgString += `${productPlur}.`;
-// 	}
-
-// 	if(dailyLimit - count == 0){
-// 		msgString += "You have reached your daily drinking limit and should not continue drinking!";
-// 	}
-// 	else if(dailyLimit - count < 0){
-// 		msgString += "You have surpassed your daily drinking limit! Your liver is crying and would like you to please stop. ";
-// 	}
-// 	else if(dailyLimit - count <= 2){
-// 		msgString += `You are nearing your desired daily beer limit of ${dailyLimit} `;
-// 		if(dailyLimit == 1){
-// 			msgString += "beer.";
-// 		}
-// 		else{
-// 			msgString += "beers.";
-// 		}
-// 	}
-
-
-
-// 	return msgString;
-// }
+    console.log(`RETURN STRING: ${msgString}`);
+    return msgString;
+}
