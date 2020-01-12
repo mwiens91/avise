@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import { Card, CardBody, CardTitle } from 'reactstrap';
 import Substance from './Substance';
 
@@ -30,6 +31,9 @@ class User extends Component {
 	};
 
 	render() {
+		if (!this.props.isAuth) {
+			return <Redirect to="/" />;
+		}
 		return (
 			<div>
 				<Card>

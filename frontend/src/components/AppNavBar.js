@@ -5,15 +5,10 @@ import LoginModal from './auth/LoginModal';
 import RegisterModal from './auth/RegisterModal';
 import '../css/App.css';
 
-import Api from '../Api';
-
 class AppNavBar extends Component {
 	state = {
 		isOpen: false,
-		isAuth: false,
-		user: null,
 	};
-	Api = new Api(process.env.REACT_APP_API_URL);
 
 	toggle = () => {
 		this.setState({
@@ -21,37 +16,12 @@ class AppNavBar extends Component {
 		});
 	};
 
-	login = async (username, password) => {
-		const data = {
-			username,
-			password,
-		};
-		const tokenJson = await this.Api.getApiTokenWithBasicAuth(data);
-		localStorage.setItem('token', tokenJson.token);
-
-		this.Api.setToken(tokenJson.token);
-
-		try {
-			const user = await this.Api.getUserFromApiToken();
-
-			this.setState({
-				isAuth: true,
-				user: user,
-			});
-			localStorage.setItem('user', JSON.stringify(user));
-		} catch (e) {
-			this.logout();
-		}
+	login = (data) => {
+		this.props.login(data);
 	};
 
 	logout = () => {
-		this.setState({
-			isAuth: false,
-			user: null,
-		});
-		this.Api.setToken(null);
-		localStorage.removeItem('token');
-		localStorage.setItem('user', null);
+		this.props.logout();
 	};
 
 	register = (data) => {
@@ -80,13 +50,14 @@ class AppNavBar extends Component {
 				</NavItem>
 			</Fragment>
 		);
+		const username = this.props.user ? this.props.user.username : '';
 
 		const authLinks = (
 			<Fragment>
 				<NavItem>
 					{/* Need to change the link to be the username */}
 					<Link to="/user" className="nav-link text-link">
-						<strong>{this.state.user ? this.state.user.username : ''}</strong>
+						<strong>{username}</strong>
 					</Link>
 				</NavItem>
 				<NavItem>
@@ -106,7 +77,7 @@ class AppNavBar extends Component {
 						<NavbarToggler onClick={this.toggle} />
 						<Collapse isOpen={this.state.isOpen} navbar>
 							<Nav className="ml-auto" navbar>
-								{this.state.isAuth ? authLinks : guestLinks}
+								{this.props.isAuth ? authLinks : guestLinks}
 							</Nav>
 						</Collapse>
 					</Container>
