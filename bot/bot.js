@@ -4,7 +4,6 @@ import Api from './api';
 var Discord = require('discord.io');
 var logger = require('winston');
 
-
 // Load in env vars from .env file and grab Discord API token
 dotenv.config();
 const discordApiToken = process.env.DISCORD_API_TOKEN;
@@ -44,12 +43,26 @@ class user {
   }
 }
 
+const ounceToMili = 29.5735;
+const avgBeerPercent = 0.045;
+const avgWinePercent = 0.116;
+const avgSpiritPercent = 0.40;
+
+//default values in ml
+const defaultWineVol = 175; 
+const shotVol = 44.3603
+const beerVol = 354.882;
+const tallCanVol = 473.176;
+const sleeveVol = 414.029;
+const pintVol = 591.471;
+const bottleWineVol = 750;
+
 
 
 let productList = ["beer", "beers", "shot", "shots", "wine", "weed", "mj"];
 let keywordsList = ["remove", "add", "set"];
-let argumentList = ["tall", "half", "glass", "of"];
-let volumnKeywordsList = ["millileters", "millileter", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
+let argumentList = ["tall", "half", "sleeve", "sleeves", "pints", "pint", "bottle", "bottles"];
+let volumeKeywordsList = ["millileters", "millileter", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
 
 
 var beer = ["beer", "beers", "wine", "spirit", "pbr", "pabst", "pabst blue ribbon",
@@ -72,7 +85,7 @@ var cigarette = ["cigarette", "cig", "cug", "smoke", "dart", "buck", "cigarettes
 var marijuana = ["joint", "thai stick", "j", "spliff", "pinner", "fatty", "bowl", "blunt"];
 
 
-
+let totAlcoholVol;
 var beerCount = 0; 
 var dailyBeerLimit = 4;
 var weeklyBeerLimit = 8;
@@ -80,8 +93,6 @@ var weeklyBeerLimit = 8;
 var wineCount = 0; 
 var dailyWineLimit = 4;
 var weeklyWineLimit = 8;
-
-const normalToTall = 1.25
 
 let displayMetric = false;
 
@@ -140,7 +151,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     let amount;
     let cmd;
     let params = [];
-    let volumn;
+    let measure;
     let size;
     let keyword; // Set, Remove, add, 
 
@@ -159,9 +170,9 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             if(args.length > i + 1){
                 // I want to access the next element, so make sure we're not at the end of the array first.
 
-                for(let j = 0; j < volumnKeywordsList.length; j++){
-                    if(args[i + 1] == volumnKeywordsList[j]){
-                        volumn = args[i + 1];
+                for(let j = 0; j < volumeKeywordsList.length; j++){
+                    if(args[i + 1] == volumeKeywordsList[j]){
+                        measure = args[i + 1];
                         size = parseInt(args[i]);
                     }
                 }
@@ -222,32 +233,36 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     }
 
     // Message has been fully parsed. Now use the data to construct the command + return message
-     console.log(`Amount: ${amount}, Product: ${cmd}, Params: ${params}, Keyword: ${keyword}, Volumn: ${volumn}`);
+     console.log(`Amount: ${amount}, Product: ${cmd}, Params: ${params}, Keyword: ${keyword}, Measure: ${measure}`);
 
     let msgStr;
     switch(cmd){
         case "beer":
-        console.log("beginning printing.");
+        case "beers":
 
-            if(amount == undefined){
-                // An amount wasn't specified, but we're going to assume they meant they drank 1 beer.
-                amount = 1;
-            }
-
-            amount = parseInt(amount, 10);
 
             for(let i = 0; i < params.length; i++){
-                if(params[i] == "tall"){
-                    amount *= normalToTall;
+                if(params[i] == "tall" ||
+                    //params[i] == "half" || 
+                    params[i] == "sleeve" ||
+                    params[i] == "pint"){
+                    measure = params[i];
+                }
+                if(params[i] == "pints"){
+                    measure = "pint";
+                }
+                if(params[i] == "sleeves"){
+                    measure = "sleeve";
                 }
             }
+            size = calcVolAlc(size, measure, amount, "beer");
 
             if(keyword == "remove"){
                     // User probably made a mistake and wants to remove that amount of liquor from the record.
                     amount *= -1;
             }
 
-            beerCount += amount;
+            totAlcoholVol += size;
             
             msgStr = beerStringBuilder(user);
             bot.sendMessage({
@@ -256,26 +271,22 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             });
         break;
         case "wine":
-
-            if(amount == undefined){
-                // An amount wasn't specified, but we're going to assume they meant they drank 1 beer.
-                amount = 1;
-            }
-
-            amount = parseInt(amount, 10);
-
             for(let i = 0; i < params.length; i++){
-                if(params[i] == "half"){
-                    amount *= 0.5;
+                if(params[i] == "half" || 
+                    params[i] == "bottle" ||
+                    params[i] == "bottles"){
+                    measure = params[i];
                 }
+
             }
+            size = calcVolAlc(size, measure, amount, "wine");
 
             if(keyword == "remove"){
                     // User probably made a mistake and wants to remove that amount of liquor from the record.
                     amount *= -1;
             }
 
-            wineCount += amount;
+            totAlcoholVol += size;
             
             msgStr = wineStringBuilder(user);
             bot.sendMessage({
@@ -296,33 +307,77 @@ function calcVolAlc(size, measure, amount, product){
     }
     
     amount = parseInt(amount, 10);
+    size = parseInt(size, 10);
 
     // Got to determine the quantity of alcohol consumed. Everything will be converted to millileters.
     if( measure == "millileters"    ||
         measure == "millileter"){
-
     }
 
-    // for(let i = 0; i < params.length; i++){
-    //     if(params[i] == "tall"){
-    //         amount *= normalToTall;
-    //     }
-    // }
+    if( measure == "ounce"    ||
+        measure == "ounces"   ||
+        measure == "oz"       ||
+        measure == "oz."){
+        // Convert to ml
+        size *= ounceToMili;
+    }
 
-    // if(keyword == "remove"){
-    //         // User probably made a mistake and wants to remove that amount of liquor from the record.
-    //         amount *= -1;
-    // }
+    if( measure == "liter"    ||
+        measure == "liters"){
+        size *= 1000;
+    }
 
-    // beerCount += amount;
-    
-    // msgStr = beerStringBuilder(user);
-    // bot.sendMessage({
-    //     to: channelID,
-    //     message: msgStr
-    // });
+    if(measure == "tall"){
+        size = tallCanVol;
+    }
 
+    if(measure == "sleeve"  ||
+        measure == "sleeves"){
+        size = sleeveVol;
+    }
 
+    if(measure == "bottle" ||
+        measure == "bottles"){
+        size = bottleWineVol;
+    }
+
+    if(measure == "pint" || measure == "pints"){
+        size = pintVol;
+    }
+
+    if(measure == "half"){
+        amount /= 2;
+    }
+
+    if(measure == undefined){
+        // use default measurements based on the type of drink
+        if(product == "beer"){
+            size = beerVol;
+        }
+        else if(product == "shot"){
+            size = shotVol;
+        }
+        else if(product == "wine"){
+            size = defaultWineVol;
+        }
+    }
+
+    // merge size with amount
+    size = size * amount;
+
+    // calculate ml of pure alcohol
+    if(product == "beer"){
+        size *= avgBeerPercent;
+    }
+    else if(product == "shot"){
+        size *= avgSpiritPercent;
+    }
+    else if(product == "wine"){
+        size *= avgWinePercent;
+    }
+
+    // return value is 100% alcohol in ml
+    return size;
 }
 
 
