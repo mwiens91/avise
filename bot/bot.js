@@ -4,12 +4,14 @@ import Api from './api';
 var Discord = require('discord.io');
 var logger = require('winston');
 
-// Load in env vars from .env file and grab Discord API token
+// Load in env vars from .env file and store them in variables
 dotenv.config();
 const discordApiToken = process.env.DISCORD_API_TOKEN;
+const aviseApiToken = process.env.AVISE_API_TOKEN;
+const aviseApiUrl = process.env.AVISE_API_URL;
 
 // Initialize Api instance
-const api = new Api('fake news', 'fake news');
+const api = new Api(aviseApiUrl, aviseApiToken);
 
 console.log("Starting Bot");
 logger.remove(logger.transports.Console);
