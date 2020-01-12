@@ -46,6 +46,8 @@ class user {
   }
 }
 
+const domainName = "www.Avise.tech";
+
 const ounceToMils = 29.5735;
 const avgBeerPercent = 0.05;
 const avgWinePercent = 0.12;
@@ -63,7 +65,7 @@ const bottleWineVol = 750;
 const mickeyVol = 375;
 
 let productList = ["beer", "beers", "wine", "weed", "mj", "drink", "drinks", "cigarette", "refill", "vape"];
-let keywordsList = ["remove", "add", "set"];
+let keywordsList = ["remove", "help", "add", "set"];
 let argumentList = ["tall", "half", "sleeve", "sleeves", "pints", "pint", "bottle", "bottles", "double", "daily", "limit", "weekly", "mickey", "mickeys"];
 let volumeKeywordsList = ["millileters", "millileter", "ml", "L", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
 
@@ -72,13 +74,13 @@ var beer = ["beer", "beers", "wine", "spirit", "pbr", "pabst", "pabst blue ribbo
     "corona", "coronas", "asahi", "miller", "millers", "coors", "guinness", "dos equis", "bud", "budweiser", "budweisers", 
     "busch", "bud light", "coors light", "miller high life", "moosehead", "mead"];
 
-var wine = ["wine", "red", "white"];
+var wine = ["wine", "red", "white", "rose"];
 
 var spirits = ["shot", "shots", "vodka", "whiskey", "tequila", "shooter", "rum", 
-    "gin", "brandy", "absinthe", "drink", "margarita", "champagne", "prosecco", "cider",
+    "gin", "brandy", "absinthe", "margarita", "champagne", "prosecco", "cider",
     "sake"];
 
-var cigarette = ["cigarette", "cig", "cug", "smoke", "dart", "buck", "cigarettes", "belmont", "pall mall", "dumaurier", "du maurier", "fag", "smokes", "smoks", "smok", "bogey", "durry", "fags", "square"];
+var cigarette = ["cigarette", "cig", "cigs", "cug", "smoke", "dart", "buck", "cigarettes", "belmont", "pall mall", "dumaurier", "du maurier", "fag", "smokes", "smoks", "smok", "bogey", "durry", "fags", "square"];
 
 
 
@@ -265,8 +267,21 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     cmd = "wine";
                 }
             }
-
+            if(!exitFlag){
+                if(cigarette.includes(args[i].toLowerCase())){
+                    // The token matched a the name for a cigarette
+                    cmd = "cigarette";
+                }
+            }
     	}
+    }
+
+    if(keyword == "help"){
+        bot.sendMessage({
+                to: channelID,
+                message: `Avise will help you track and visualize your substance consumption. All you have to do is tell Avi what you've consumed and she'll log it for you. Commands can use natural language such as, \"I smoked 3 cigarettes today.\" or you can use short forms such as, \"3 cigs\". Avi will do her best to interpret what you're trying to tell her. If data has been logged erroneously, you can tell Avi to remove data with the \"remove\" keyword. For more details and full data visualization, please visit the website at ${domainName}.`
+            });
+        return;
     }
 
     // Message has been fully parsed. Now use the data to construct the command + return message
@@ -493,6 +508,11 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 message: msgStr
             });        } )
             break;
+        default:
+        bot.sendMessage({
+                to: channelID,
+                message: `I'm sorry, ${user}, that's not a command I recognize. Please use this bot to help you track the substances you use. If you're still confused, please type help for more details.`
+            });
         
     }      		
 });
@@ -599,7 +619,7 @@ function alcoholConsumptionStringBuilder(user, volConsumed){
         // it doesn't make sence to have a negative amount of drinks.
         drinks = 0.0;
     }
-    msgString += `${user} you've had ${drinks} drinks.`;
+    msgString += `${user} you've had ${drinks} drinks today.`;
 
     // let limitRatio = volConsumed / dailyLimit;
     // dailyLimit = (dailyLimit/standardDrinkVol).toFixed(1);
@@ -634,10 +654,10 @@ function cigaretteStringBuilder(user, amountSmoked){
     msgString += `${user} you've smoked ${count} `;
 
     if(count == 1){
-        msgString += "cigarette.";
+        msgString += "cigarette today.";
     }
     else{
-        msgString += "cigarettes.";
+        msgString += "cigarettes today.";
     }
 
     if(dailyLimit - count == 0){
@@ -674,10 +694,10 @@ function vapeStringBuilder(user, amountSmoked){
     msgString += `${user} you've inhaled ${count} `;
 
     if(count == 1){
-        msgString += "mg of nicotine.";
+        msgString += "mg of nicotine today.";
     }
     else{
-        msgString += "mgs of nicotine.";
+        msgString += "mgs of nicotine today.";
     }
 
     if(dailyLimit - count == 0){
