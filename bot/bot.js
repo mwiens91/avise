@@ -62,9 +62,7 @@ const pintVol = 591.471;
 const bottleWineVol = 750;
 const mickeyVol = 375;
 
-
-
-let productList = ["beer", "beers", "wine", "weed", "mj", "drink", "drinks", "cigarette", "vape"];
+let productList = ["beer", "beers", "wine", "weed", "mj", "drink", "drinks", "cigarette", "refill", "vape"];
 let keywordsList = ["remove", "add", "set"];
 let argumentList = ["tall", "half", "sleeve", "sleeves", "pints", "pint", "bottle", "bottles", "double", "daily", "limit", "weekly", "mickey", "mickeys"];
 let volumeKeywordsList = ["millileters", "millileter", "ml", "L", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
@@ -148,7 +146,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     // 	return;
     // }
 
-console.log("Jayden: " + userID);
+console.log("Juno: " + userID);
 
     // You don't want the bot to process messages that the bot itself sends.
     console.log(`USER: ${user}, BOT: ${bot.username}`);
@@ -331,7 +329,7 @@ console.log("Jayden: " + userID);
 
             changeInAlcohol = size;
             totAlcoholVol += size;
-            try{api.submitAlcohol(userID, "beer", changeInAlcohol);}
+            try{api.submitAlcohol(userID.toString(), "beer", changeInAlcohol);}
             catch(error){
 
             }
@@ -379,7 +377,7 @@ console.log("Jayden: " + userID);
             }
             changeInAlcohol = size;
             totAlcoholVol += size;
-            try{api.submitAlcohol(userID, "spirits", changeInAlcohol);}
+            try{api.submitAlcohol(userID.toString(), "spirits", changeInAlcohol);}
             catch(error){
 
             }
@@ -464,7 +462,9 @@ console.log("Jayden: " + userID);
             }
 
             cigaretteCount += amount;
-            api.submitNicotine(userID.toString(), "cigarette", amount);
+
+            try{api.submitNicotine(userID.toString(), "cigarette", amount);}
+            catch(error){}
 
             msgStr = cigaretteStringBuilder(user, amount);
             bot.sendMessage({
@@ -473,12 +473,9 @@ console.log("Jayden: " + userID);
             });
         break;
 
+        case "refill":
         case "vape":
-            var tankSize;
-            var strength;
-
-            userVapeStats = [tankSize, strength];
-            userVapeStats = api.getUserVape(discordId);
+            api.getUserVape(userID.toString()).then(vape => {
 
             amount = parseFloat(amount, 10);
 
@@ -486,13 +483,11 @@ console.log("Jayden: " + userID);
                     // User probably made a mistake and wants to remove that amount of vape juice from the record.
                     amount *= -1;
             }
-            amountNicotine = (amount*userVapeStats[1]*tankSize);
-            vapeMgNicotineCount += amountNicotine;
-            
-            try{api.submitNicotine(userID.toString(), "vape", amountNicotine);}
-            catch (error){
 
-            }
+            amountNicotine = (amount*vape["strength"]*vape["volume"]);
+            vapeMgNicotineCount += amountNicotine;
+            try{api.submitNicotine(userID.toString(), "vape", amountNicotine);}
+            catch{}
 
             msgStr = vapeStringBuilder(user, amountNicotine);
             bot.sendMessage({
@@ -500,6 +495,7 @@ console.log("Jayden: " + userID);
                 message: msgStr
             });        
             break;
+        }
     }      		
 });
 
