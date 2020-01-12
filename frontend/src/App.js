@@ -72,8 +72,33 @@ class App extends Component {
 			};
 			this.login(userData);
 		} catch (e) {
-			console.log('from app');
 			this.setState({ error: 'Failed to create user.' });
+		}
+	};
+
+	updateVape = async (data) => {
+		try {
+			const vape = await this.Api.updateVape(data);
+			const user = { ...this.state.user };
+			user.vape = vape;
+			this.setState({
+				user,
+			});
+		} catch (e) {
+			this.setState({ error: 'Failed to update vape' });
+		}
+	};
+
+	createVape = async (data) => {
+		try {
+			const vape = await this.Api.createVape(data);
+			const user = { ...this.state.user };
+			user.vape = vape;
+			this.setState({
+				user,
+			});
+		} catch (e) {
+			this.setState({ error: 'Failed to update vape' });
 		}
 	};
 
@@ -99,7 +124,15 @@ class App extends Component {
 						/>
 						<Route
 							path="/settings"
-							render={(props) => <Settings {...props} isAuth={isAuth} user={user} />}
+							render={(props) => (
+								<Settings
+									{...props}
+									isAuth={isAuth}
+									user={user}
+									updateVape={this.updateVape}
+									createVape={this.createVape}
+								/>
+							)}
 						/>
 					</Container>
 				</Router>
