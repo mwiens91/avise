@@ -13,7 +13,7 @@ class DataPointAlcoholSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DataPointAlcohol
-        fields = ("id", "datetime", "user", "quantity")
+        fields = ("id", "datetime", "user", "quantity", "category")
 
 
 class DataPointNicotineSerializer(serializers.ModelSerializer):
@@ -21,7 +21,7 @@ class DataPointNicotineSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DataPointNicotine
-        fields = ("id", "datetime", "user", "quantity")
+        fields = ("id", "datetime", "user", "quantity", "category")
 
 
 class UserReadOnlySerializer(serializers.ModelSerializer):
