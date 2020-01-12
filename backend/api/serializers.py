@@ -1,5 +1,6 @@
 """Contains serializers for models."""
 
+from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from .models import (
     DataPointAlcohol,
@@ -58,6 +59,18 @@ class UserReadOnlySerializer(serializers.ModelSerializer):
 
 class UserWriteSerializer(serializers.ModelSerializer):
     """A write serializer for users."""
+
+
+    def create(self, validated_data):
+        user = User(
+            email=validated_data['email'],
+            username=validated_data['username']
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+
 
     class Meta:
         model = User
