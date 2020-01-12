@@ -14,6 +14,9 @@ class User(AbstractUser):
     track_alcohol = models.BooleanField(
         default=True, help_text="Whether to track alcohol consumption."
     )
+    discord_id = models.CharField(
+        max_length=30, null=True, blank=True, default=None
+    )
 
     class Meta:
         """Model metadata."""

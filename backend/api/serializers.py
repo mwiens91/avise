@@ -36,6 +36,7 @@ class UserReadOnlySerializer(serializers.ModelSerializer):
             "username",
             "track_nicotine",
             "track_alcohol",
+            "discord_id",
             "alcohol_data_points",
             "nicotine_data_points",
             "date_joined",
@@ -53,6 +54,7 @@ class UserWriteSerializer(serializers.ModelSerializer):
             "email",
             "username",
             "password",
+            "discord_id",
             "track_nicotine",
             "track_alcohol",
         )
