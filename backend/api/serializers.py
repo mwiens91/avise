@@ -25,7 +25,7 @@ class DataPointNicotineSerializer(serializers.ModelSerializer):
 
 
 class UserReadOnlySerializer(serializers.ModelSerializer):
-    """A serializer for a user."""
+    """A read-only serializer for a user."""
 
     alcohol_data_points = DataPointAlcoholSerializer(many=True)
     nicotine_data_points = DataPointNicotineSerializer(many=True)
@@ -34,6 +34,8 @@ class UserReadOnlySerializer(serializers.ModelSerializer):
         model = User
         fields = (
             "username",
+            "track_nicotine",
+            "track_alcohol",
             "alcohol_data_points",
             "nicotine_data_points",
             "date_joined",
