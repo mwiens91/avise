@@ -30,20 +30,17 @@ class AbstractDataPoint(models.Model):
 
     datetime = models.DateTimeField(auto_now_add=True)
     quantity = models.FloatField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
 
 
 class DataPointNicotine(AbstractDataPoint):
-    # TODO: add a category field here with list of choices
-    pass
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="nicotine_data_points")
 
 
 class DataPointAlcohol(AbstractDataPoint):
-    # TODO: add a category field here with list of choices
-    pass
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="alcohol_data_points")
 
 
 @receiver(post_save, sender=User)

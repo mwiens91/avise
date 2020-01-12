@@ -8,14 +8,6 @@ from .models import (
 )
 
 
-class UserReadOnlySerializer(serializers.ModelSerializer):
-    """A serializer for a user."""
-
-    class Meta:
-        model = User
-        fields = ("username", "date_joined", "last_login", "is_staff")
-
-
 class DataPointAlcoholSerializer(serializers.ModelSerializer):
     """A serializer for a alcohol data points."""
 
@@ -30,3 +22,21 @@ class DataPointNicotineSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataPointNicotine
         fields = ("id", "datetime", "user", "quantity")
+
+
+class UserReadOnlySerializer(serializers.ModelSerializer):
+    """A serializer for a user."""
+
+    alcohol_data_points = DataPointAlcoholSerializer(many=True)
+    nicotine_data_points = DataPointNicotineSerializer(many=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "alcohol_data_points",
+            "nicotine_data_points",
+            "date_joined",
+            "last_login",
+            "is_staff",
+        )
