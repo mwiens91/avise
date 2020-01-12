@@ -1,12 +1,13 @@
 import React, { Component, Fragment } from 'react';
 import { Jumbotron } from 'reactstrap';
+import '../css/App.css';
 
 class Home extends Component {
 	render() {
 		return (
 			<Fragment>
 				<Jumbotron>
-					<h1 className="display-3">AppName</h1>
+					<h1 className="display-3 work-sans">Avise</h1>
 					<p className="lead">
 						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent molestie arcu nisl, eu
 						vehicula neque venenatis in. Cras fermentum leo eget lobortis eleifend.

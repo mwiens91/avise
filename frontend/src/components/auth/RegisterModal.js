@@ -10,6 +10,7 @@ import {
 	Input,
 	NavLink,
 } from 'reactstrap';
+import '../../css/App.css';
 
 class RegisterModal extends Component {
 	state = {
@@ -34,18 +35,22 @@ class RegisterModal extends Component {
 	onSubmit = (e) => {
 		e.preventDefault();
 
-		const { email, password } = this.state;
+		const { username, email, password, confirm_password } = this.state;
 
-		const user = {
+		const data = {
+			username,
 			email,
 			password,
+			confirm_password,
 		};
+
+		this.props.register(data);
 	};
 
 	render() {
 		return (
 			<div>
-				<NavLink onClick={this.toggle} href="#">
+				<NavLink onClick={this.toggle} href="#" className="text-link">
 					Register
 				</NavLink>
 				<Modal isOpen={this.state.modal} toggle={this.toggle}>
@@ -89,8 +94,8 @@ class RegisterModal extends Component {
 									className="mb-3"
 									onChange={this.onChange}
 								/>
-								<Button color="dark" style={{ marginTop: '2rem' }} block>
-									Login
+								<Button color="info" outline style={{ marginTop: '2rem' }} block>
+									Register
 								</Button>
 							</FormGroup>
 						</Form>
