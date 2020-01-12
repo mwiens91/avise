@@ -330,7 +330,7 @@ console.log("Juno: " + userID);
 
             changeInAlcohol = size;
             totAlcoholVol += size;
-            try{api.submitAlcohol(userID, "beer", changeInAlcohol);}
+            try{api.submitAlcohol(userID.toString(), "beer", changeInAlcohol);}
             catch(error){
 
             }
@@ -378,7 +378,7 @@ console.log("Juno: " + userID);
             }
             changeInAlcohol = size;
             totAlcoholVol += size;
-            try{api.submitAlcohol(userID, "spirits", changeInAlcohol);}
+            try{api.submitAlcohol(userID.toString(), "spirits", changeInAlcohol);}
             catch(error){
 
             }
@@ -475,11 +475,7 @@ changeInAlcohol = size;
 
         case "refill":
         case "vape":
-            var tankSize;
-            var strength;
-
-            userVapeStats = [tankSize, strength];
-            userVapeStats = api.getUserVape(discordId);
+            api.getUserVape(userID.toString()).then(vape => {
 
             amount = parseInt(amount, 10);
 
@@ -487,7 +483,7 @@ changeInAlcohol = size;
                     // User probably made a mistake and wants to remove that amount of vape juice from the record.
                     amount *= -1;
             }
-            amountNicotine = (amount*userVapeStats[1]*tankSize);
+            amountNicotine = (amount*vape["strength"]*vape["volume"]);
             vapeMgNicotineCount += amountNicotine;
             try{api.submitNicotine(userID.toString(), "vape", amountNicotine);}
             catch{}
@@ -496,7 +492,7 @@ changeInAlcohol = size;
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
-            });        
+            });        })
         break;
     }      		
 });
