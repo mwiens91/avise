@@ -14,8 +14,8 @@ import Api from './Api';
 
 class App extends Component {
 	state = {
-		isAuth: false,
-		user: null,
+		isAuth: localStorage.getItem('token') !== null ? true : false,
+		user: localStorage.getItem('user') !== null ? JSON.parse(localStorage.getItem('user')) : null,
 		error: '',
 	};
 
@@ -72,8 +72,48 @@ class App extends Component {
 			};
 			this.login(userData);
 		} catch (e) {
-			console.log('from app');
 			this.setState({ error: 'Failed to create user.' });
+		}
+	};
+
+	updateVape = async (data) => {
+		try {
+			const vape = await this.Api.updateVape(data);
+			const user = { ...this.state.user };
+			user.vape = vape;
+			this.setState({
+				user,
+			});
+		} catch (e) {
+			this.setState({ error: 'Failed to update vape' });
+		}
+	};
+
+	createVape = async (data) => {
+		try {
+			const vape = await this.Api.createVape(data);
+			const user = { ...this.state.user };
+			user.vape = vape;
+			this.setState({
+				user,
+			});
+		} catch (e) {
+			this.setState({ error: 'Failed to set vape' });
+		}
+	};
+	updatePref = async (data) => {
+		try {
+			const updatedUser = await this.Api.updatePref(data);
+			const user = { ...this.state.user };
+			user.discord_id = updatedUser.discord_id;
+			user.track_nicotine = updatedUser.track_nicotine;
+			user.track_alcohol = updatedUser.track_alcohol;
+
+			this.setState({
+				user,
+			});
+		} catch (e) {
+			this.setState({ error: 'Failed to update user preferences' });
 		}
 	};
 
@@ -99,7 +139,16 @@ class App extends Component {
 						/>
 						<Route
 							path="/settings"
-							render={(props) => <Settings {...props} isAuth={isAuth} user={user} />}
+							render={(props) => (
+								<Settings
+									{...props}
+									isAuth={isAuth}
+									user={user}
+									updateVape={this.updateVape}
+									createVape={this.createVape}
+									updatePref={this.updatePref}
+								/>
+							)}
 						/>
 					</Container>
 				</Router>

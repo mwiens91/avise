@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col } from 'reactstrap';
+import { Card, CardBody } from 'reactstrap';
 import {
 	LineChart,
 	Line,
@@ -16,15 +16,13 @@ import {
 class Substance extends Component {
 	state = {};
 	render() {
-		console.log(this.props.substances);
-
 		return (
 			<div>
-				<Row>
-					<Col>
+				<Card className="mb-3">
+					<CardBody>
 						<LineChart
 							width={500}
-							height={300}
+							height={400}
 							data={this.props.data}
 							margin={{
 								top: 5,
@@ -41,11 +39,13 @@ class Substance extends Component {
 							<Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
 							<Line type="monotone" dataKey="uv" stroke="#82ca9d" />
 						</LineChart>
-					</Col>
-					<Col>
+					</CardBody>
+				</Card>
+				<Card className="mb-3">
+					<CardBody>
 						<BarChart
 							width={500}
-							height={300}
+							height={400}
 							data={this.props.data}
 							margin={{
 								top: 5,
@@ -63,8 +63,8 @@ class Substance extends Component {
 							<Bar dataKey="pv" stackId="a" fill="#8884d8" />
 							<Bar dataKey="uv" stackId="a" fill="#82ca9d" />
 						</BarChart>
-					</Col>
-				</Row>
+					</CardBody>
+				</Card>
 			</div>
 		);
 	}
