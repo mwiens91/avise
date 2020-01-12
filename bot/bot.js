@@ -1,6 +1,12 @@
+import dotenv from 'dotenv';
+
 var Discord = require('discord.io');
 var logger = require('winston');
-var auth = require('./auth.json');
+
+
+// Load in env vars from .env file and grab Discord API token
+dotenv.config();
+const discordApiToken = process.env.DISCORD_API_TOKEN;
 
 console.log("Starting Bot");
 logger.remove(logger.transports.Console);
@@ -11,7 +17,7 @@ logger.add(new logger.transports.Console, {
 logger.level = 'debug';
 // Initialize Discord Bot
 var bot = new Discord.Client({
-   token: auth.token,
+   token: discordApiToken,
    autorun: true
 });
 console.log("Bot initialized");
