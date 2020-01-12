@@ -36,14 +36,12 @@ class User extends Component {
 		}
 		return (
 			<div>
-				<Card>
+				<Card className="mb-3">
 					<CardBody>
 						<CardTitle style={{ fontSize: '2rem' }}>Nicotine</CardTitle>
-						<CardBody>
-							<Substance data={this.state.data} substances={this.state.substances} />
-						</CardBody>
 					</CardBody>
 				</Card>
+				<Substance data={this.state.data} substances={this.state.substances} />
 			</div>
 		);
 	}
