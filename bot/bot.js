@@ -64,7 +64,7 @@ const mickeyVol = 375;
 
 
 
-let productList = ["beer", "beers", "wine", "weed", "mj", "drink", "drinks", "cigarette"];
+let productList = ["beer", "beers", "wine", "weed", "mj", "drink", "drinks", "cigarette", "vape"];
 let keywordsList = ["remove", "add", "set"];
 let argumentList = ["tall", "half", "sleeve", "sleeves", "pints", "pint", "bottle", "bottles", "double", "daily", "limit", "weekly", "mickey", "mickeys"];
 let volumeKeywordsList = ["millileters", "millileter", "ml", "L", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
@@ -151,6 +151,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 console.log("Jayden: " + userID);
 
     // You don't want the bot to process messages that the bot itself sends.
+    console.log(`USER: ${user}, BOT: ${bot.username}`);
     if(user == bot.username){ return};
 
     if(message.substring(0, 1) == '!'){
@@ -399,7 +400,7 @@ console.log("Jayden: " + userID);
                     size *= -1;
             }
 
-changeInAlcohol = size;
+            changeInAlcohol = size;
             totAlcoholVol += size;
             try{api.submitAlcohol(userID.toString(), "beer", changeInAlcohol);}
             catch(error){
@@ -463,7 +464,7 @@ changeInAlcohol = size;
             }
 
             cigaretteCount += amount;
-            api.submitNicotine(userID, "cigarette", amount);
+            api.submitNicotine(userID.toString(), "cigarette", amount);
 
             msgStr = cigaretteStringBuilder(user, amount);
             bot.sendMessage({
@@ -476,25 +477,29 @@ changeInAlcohol = size;
             var tankSize;
             var strength;
 
-            userVapeStats = [tankSize, strength]
+            userVapeStats = [tankSize, strength];
             userVapeStats = api.getUserVape(discordId);
 
-            amount = parseInt(amount, 10);
+            amount = parseFloat(amount, 10);
 
             if(keyword == "remove"){
                     // User probably made a mistake and wants to remove that amount of vape juice from the record.
                     amount *= -1;
             }
-            amountNicotine = (amount*userVapeStats[1]*tankSize)
+            amountNicotine = (amount*userVapeStats[1]*tankSize);
             vapeMgNicotineCount += amountNicotine;
-            api.submitNicotine(userID, "vape", amountNicotine);
+            
+            try{api.submitNicotine(userID.toString(), "vape", amountNicotine);}
+            catch (error){
+
+            }
 
             msgStr = vapeStringBuilder(user, amountNicotine);
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
             });        
-            break
+            break;
     }      		
 });
 
