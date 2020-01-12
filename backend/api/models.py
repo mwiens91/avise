@@ -36,11 +36,15 @@ class AbstractDataPoint(models.Model):
 
 
 class DataPointNicotine(AbstractDataPoint):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="nicotine_data_points")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="nicotine_data_points"
+    )
 
 
 class DataPointAlcohol(AbstractDataPoint):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="alcohol_data_points")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="alcohol_data_points"
+    )
 
 
 @receiver(post_save, sender=User)
