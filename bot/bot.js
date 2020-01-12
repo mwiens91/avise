@@ -146,10 +146,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     // 	return;
     // }
 
-console.log("Juno: " + userID);
-
     // You don't want the bot to process messages that the bot itself sends.
-    console.log(`USER: ${user}, BOT: ${bot.username}`);
     if(user == bot.username){ return};
 
     if(message.substring(0, 1) == '!'){
@@ -334,7 +331,7 @@ console.log("Juno: " + userID);
 
             }
             
-            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol,);
+            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol);
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
@@ -381,7 +378,7 @@ console.log("Juno: " + userID);
             catch(error){
 
             }
-            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol,);
+            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol);
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
@@ -402,7 +399,7 @@ console.log("Juno: " + userID);
             totAlcoholVol += size;
             try{api.submitAlcohol(userID.toString(), "beer", changeInAlcohol);}
             catch(error){
-
+                    console.log(error);
             }
             msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol);
             bot.sendMessage({
@@ -476,6 +473,8 @@ console.log("Juno: " + userID);
         case "refill":
         case "vape":
             api.getUserVape(userID.toString()).then(vape => {
+            
+            if (vape === null)  {return;}
 
             amount = parseFloat(amount, 10);
 
@@ -483,8 +482,7 @@ console.log("Juno: " + userID);
                     // User probably made a mistake and wants to remove that amount of vape juice from the record.
                     amount *= -1;
             }
-
-            amountNicotine = (amount*vape["strength"]*vape["volume"]);
+            let amountNicotine = (amount*vape["strength"]*vape["volume"]);
             vapeMgNicotineCount += amountNicotine;
             try{api.submitNicotine(userID.toString(), "vape", amountNicotine);}
             catch{}
@@ -493,9 +491,9 @@ console.log("Juno: " + userID);
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
-            });        
+            });        } )
             break;
-        }
+        
     }      		
 });
 
