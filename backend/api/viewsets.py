@@ -80,16 +80,22 @@ class ObtainAuthTokenView(APIView):
 class UserViewSet(viewsets.ModelViewSet):
     """A viewset for users."""
 
-    def get_serializer_class(self, *args, **kwargs):
-        if self.request.method in ("POST", "PATCH"):
-            return UserWriteSerializer
-
-        return UserReadOnlySerializer
-
     queryset = User.objects.all()
     lookup_field = "username"
     http_method_names = ["get", "post", "patch"]
     permission_classes = (AllowAnyForPostAndGetPermission,)
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method in ("POST", "PATCH"):
+            return UserWriteSerializer["get", "post", "patch"]
+
+
+        return UserReadOnlySerializer
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+
+        return user
 
 
 class DataPointAlcoholViewSet(viewsets.ModelViewSet):
