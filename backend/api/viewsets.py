@@ -39,9 +39,7 @@ def current_user_from_token(request, token):
         user = Token.objects.get(key=token).user
     except ObjectDoesNotExist:
         return Response(
-            {
-                "Bad request": "Discord ID does not correspond to an existing user"
-            },
+            {"Bad request": "Token does not correspond to an existing user"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -58,7 +56,9 @@ def current_user_from_discord_id(request, discord_id):
 
     if not users:
         return Response(
-            {"Bad request": "Token does not correspond to an existing user"},
+            {
+                "Bad request": "Discord ID does not correspond to an existing user"
+            },
             status=status.HTTP_400_BAD_REQUEST,
         )
 
