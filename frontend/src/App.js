@@ -14,8 +14,8 @@ import Api from './Api';
 
 class App extends Component {
 	state = {
-		isAuth: false,
-		user: null,
+		isAuth: localStorage.getItem('token') !== null ? true : false,
+		user: localStorage.getItem('user') !== null ? JSON.parse(localStorage.getItem('user')) : null,
 		error: '',
 	};
 
