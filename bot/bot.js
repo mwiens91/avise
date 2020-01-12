@@ -148,7 +148,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     // 	return;
     // }
 
-console.log("Jayden: " + userID);
+console.log("Juno: " + userID);
 
     // You don't want the bot to process messages that the bot itself sends.
     if(user == bot.username){ return};
@@ -463,7 +463,8 @@ changeInAlcohol = size;
             }
 
             cigaretteCount += amount;
-            api.submitNicotine(userID, "cigarette", amount);
+            try{api.submitNicotine(userID.toString(), "cigarette", amount);}
+            catch(error){}
 
             msgStr = cigaretteStringBuilder(user, amount);
             bot.sendMessage({
@@ -476,7 +477,7 @@ changeInAlcohol = size;
             var tankSize;
             var strength;
 
-            userVapeStats = [tankSize, strength]
+            userVapeStats = [tankSize, strength];
             userVapeStats = api.getUserVape(discordId);
 
             amount = parseInt(amount, 10);
@@ -485,16 +486,17 @@ changeInAlcohol = size;
                     // User probably made a mistake and wants to remove that amount of vape juice from the record.
                     amount *= -1;
             }
-            amountNicotine = (amount*userVapeStats[1]*tankSize)
+            amountNicotine = (amount*userVapeStats[1]*tankSize);
             vapeMgNicotineCount += amountNicotine;
-            api.submitNicotine(userID, "vape", amountNicotine);
+            try{api.submitNicotine(userID.toString(), "vape", amountNicotine);}
+            catch{}
 
             msgStr = vapeStringBuilder(user, amountNicotine);
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
             });        
-            break
+        break;
     }      		
 });
 
