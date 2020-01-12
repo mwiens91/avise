@@ -37,19 +37,16 @@ class LoginModal extends Component {
 
 		const { username, password } = this.state;
 
-		// Get auth token from API HERE
+		this.props.login(username, password);
 
-		this.setState({
-			username,
-		});
-
+		// Should only toggle if login is successful
 		this.toggle();
 	};
 
 	render() {
 		return (
 			<div>
-				<NavLink onClick={this.toggle} href="#">
+				<NavLink onClick={this.toggle} href="#" className="text-link">
 					Login
 				</NavLink>
 				<Modal isOpen={this.state.modal} toggle={this.toggle}>
@@ -75,7 +72,7 @@ class LoginModal extends Component {
 									className="mb-3"
 									onChange={this.onChange}
 								/>
-								<Button color="success" style={{ marginTop: '2rem' }} block>
+								<Button color="success" outline style={{ marginTop: '2rem' }} block>
 									Login
 								</Button>
 							</FormGroup>
