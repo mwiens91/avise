@@ -25,11 +25,11 @@ class Home extends Component {
 					<Col>
 						<Card>
 							<h1 className="mt-3" style={{ fontSize: '1.5rem', textAlign: 'center' }}>
-								Card 1
+								Discord
 							</h1>
 							<CardBody>
-								Phasellus quis tincidunt nisl. Mauris aliquet sollicitudin sapien, at blandit quam
-								eleifend nec. Ut non aliquet est.
+								A Discord bot is used to input the users use of substances. Users will input data
+								using everyday language.
 							</CardBody>
 						</Card>
 					</Col>
@@ -37,18 +37,18 @@ class Home extends Component {
 					<Col>
 						<Card>
 							<h1 className="mt-3" style={{ fontSize: '1.5rem', textAlign: 'center' }}>
-								Card 2
+								Rechart.js
 							</h1>
 							<CardBody>
-								Phasellus quis tincidunt nisl. Mauris aliquet sollicitudin sapien, at blandit quam
-								eleifend nec. Ut non aliquet est.
+								The users data will be visualized using Rechart.js to inform the user of their use.
+								Data will be pulled from weekly and daily use.
 							</CardBody>
 						</Card>
 					</Col>
 					<Col>
 						<Card>
 							<h1 className="mt-3" style={{ fontSize: '1.5rem', textAlign: 'center' }}>
-								Card 3
+								Google Cloud
 							</h1>
 							<CardBody>
 								Phasellus quis tincidunt nisl. Mauris aliquet sollicitudin sapien, at blandit quam
