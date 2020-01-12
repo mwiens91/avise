@@ -62,7 +62,7 @@ const bottleWineVol = 750;
 
 let productList = ["beer", "beers", "shot", "shots", "wine", "weed", "mj"];
 let keywordsList = ["remove", "add", "set"];
-let argumentList = ["tall", "half", "sleeve", "sleeves", "pints", "pint", "bottle", "bottles"];
+let argumentList = ["tall", "half", "sleeve", "sleeves", "pints", "pint", "bottle", "bottles", "double"];
 let volumeKeywordsList = ["millileters", "millileter", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
 
 
@@ -272,6 +272,33 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 message: msgStr
             });
         break;
+        case "shot":
+        case "shots":
+
+            for(let i = 0; i < params.length; i++){
+                if(params[i] == "double" || 
+                    params[i] == "bottle" ||
+                    params[i] == "bottles"){
+                    measure = params[i];
+                }
+            }
+
+            console.log(`Amount: ${amount}, Product: ${cmd}, Keyword: ${keyword}, Measure: ${measure}, Size: ${size}` );
+            size = calcVolAlc(size, measure, amount, "shot");
+
+            if(keyword == "remove"){
+                    // User probably made a mistake and wants to remove that amount of liquor from the record.
+                    size *= -1;
+            }
+
+            totAlcoholVol += size;
+            
+            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol, "shot");
+            bot.sendMessage({
+                to: channelID,
+                message: msgStr
+            });
+        break;
         case "wine":
             for(let i = 0; i < params.length; i++){
                 if(params[i] == "half" || 
@@ -354,6 +381,10 @@ function calcVolAlc(size, measure, amount, product){
 
     if(measure == "half"){
         amount /= 2;
+    }
+
+    if(measure == "double"){
+        amount *= 2;
     }
 
     if(measure == undefined){
