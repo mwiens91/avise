@@ -64,7 +64,7 @@ const mickeyVol = 375;
 
 
 
-let productList = ["beer", "beers", "wine", "weed", "mj", "drink", "drinks"];
+let productList = ["beer", "beers", "wine", "weed", "mj", "drink", "drinks", "cigarette"];
 let keywordsList = ["remove", "add", "set"];
 let argumentList = ["tall", "half", "sleeve", "sleeves", "pints", "pint", "bottle", "bottles", "double", "daily", "limit", "weekly", "mickey", "mickeys"];
 let volumeKeywordsList = ["millileters", "millileter", "ml", "L", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
@@ -95,6 +95,11 @@ var weeklyBeerLimit = 8;
 // var wineCount = 0; 
 // var dailyWineLimit = 4;
 // var weeklyWineLimit = 8;
+
+var cigaretteCount = 0;
+var dailyCigaretteLimit = 20;
+var weeklyCigaretteLimit = 140;
+var cigaretteToWater = 0;
 
 let displayMetric = false;
 
@@ -439,6 +444,29 @@ changeInAlcohol = size;
                 message: msgStr
             });
         break;
+
+        case "cigarette":
+
+            if(amount == undefined) {
+                amount = 1;
+            }
+
+            amount = parseInt(amount, 10);
+
+            if(keyword == "remove"){
+                    // User probably made a mistake and wants to remove that amount of cigarettes from the record.
+                    amount *= -1;
+            }
+
+            cigaretteCount += amount;
+            api.submitNicotine(userID, "cigarette", amount);
+
+            msgStr = cigaretteStringBuilder(user, amount);
+            bot.sendMessage({
+                to: channelID,
+                message: msgStr
+            });
+        break;
     }
 
        		
@@ -569,5 +597,45 @@ function alcoholConsumptionStringBuilder(user, volConsumed){
     // }
 
     // console.log(`RETURN STRING: ${msgString}`);
+    return msgString;
+}
+
+function cigaretteStringBuilder(user, amountSmoked){
+    let msgString = "";
+    let dailyLimit = dailyCigaretteLimit;
+    let weeklyLimit = weeklyCigaretteLimit;
+    let count = amountSmoked;
+
+    msgString += `${user} you've smoked ${count} `;
+
+    if(count == 1){
+        msgString += "cigarette.";
+    }
+    else{
+        msgString += "cigarettes.";
+    }
+
+    if(dailyLimit - count == 0){
+        msgString += " You have reached your daily smoking limit and should not continue smoking!";
+    }
+    else if(dailyLimit - count == -1){
+        // user has smoked 1 cigarette past their limit.
+        msgString += " You have surpassed your daily smoking limit! Your lungs are crying and would like you to please stop ;-; ";
+    }
+    else if(dailyLimit - count < -1){
+        // user has smoked 1 cigarette past their limit.
+        msgString += " You have greatly surpassed your daily cigarette limit! Future 'you' is going to be very disappointed.";
+    }
+    else if(dailyLimit - count <= 2){
+        msgString += ` You are nearing your desired daily cigarette limit of ${dailyLimit} `;
+        if(dailyLimit == 1){
+            msgString += "cigarette.";
+        }
+        else{
+            msgString += "cigarettes.";
+        }
+    }
+
+    console.log(`RETURN STRING: ${msgString}`);
     return msgString;
 }
