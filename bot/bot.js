@@ -451,7 +451,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 amount = 1;
             }
 
-            amount = parseInt(amount, 10);
+            amount = parseFloat(amount, 10);
 
             if(keyword == "remove"){
                     // User probably made a mistake and wants to remove that amount of cigarettes from the record.
@@ -463,7 +463,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             try{api.submitNicotine(userID.toString(), "cigarette", amount);}
             catch(error){}
 
-            msgStr = cigaretteStringBuilder(user, amount);
+            msgStr = cigaretteStringBuilder(user, cigaretteCount);
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
@@ -487,7 +487,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             try{api.submitNicotine(userID.toString(), "vape", amountNicotine);}
             catch{}
 
-            msgStr = vapeStringBuilder(user, amountNicotine);
+            msgStr = vapeStringBuilder(user, vapeMgNicotineCount);
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
