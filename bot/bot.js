@@ -57,18 +57,18 @@ const tallCanVol = 473.176;
 const sleeveVol = 414.029;
 const pintVol = 591.471;
 const bottleWineVol = 750;
+const mickeyVol = 375;
 
 
 
 let productList = ["beer", "beers", "wine", "weed", "mj", "drink", "drinks"];
 let keywordsList = ["remove", "add", "set"];
-let argumentList = ["tall", "half", "sleeve", "sleeves", "pints", "pint", "bottle", "bottles", "double"];
+let argumentList = ["tall", "half", "sleeve", "sleeves", "pints", "pint", "bottle", "bottles", "double", "daily", "limit", "weekly", "mickey", "mickeys"];
 let volumeKeywordsList = ["millileters", "millileter", "ml", "L", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
 
-
 var beer = ["beer", "beers", "wine", "spirit", "pbr", "pabst", "pabst blue ribbon",
-    "heineken", "brewski", "ber", "bere", "sleeman", "cariboo", "sleeve",
-    "corona", "asahi", "miller", "coors", "guinness", "dos equis", "bud", 
+    "heineken", "heinekens", "brewski", "ber", "bere", "sleeman", "cariboo", "sleeve",
+    "corona", "coronas", "asahi", "miller", "millers", "coors", "guinness", "dos equis", "bud", "budweiser", "budweisers", 
     "busch", "bud light", "coors light", "miller high life", "moosehead", "mead"];
 
 var wine = ["wine", "red", "white"];
@@ -77,11 +77,7 @@ var spirits = ["shot", "shots", "vodka", "whiskey", "tequila", "shooter", "rum",
     "gin", "brandy", "absinthe", "drink", "margarita", "champagne", "prosecco", "cider",
     "sake"];
 
-var cigarette = ["cigarette", "cig", "cug", "smoke", "dart", "buck", "cigarettes",
-    "belmont", "pall mall", "dumaurier", "du maurier", "fag", "smokes", "smoks", "smok",
-
-
-    "bogey", "durry", "fags", "square"];
+var cigarette = ["cigarette", "cig", "cug", "smoke", "dart", "buck", "cigarettes", "belmont", "pall mall", "dumaurier", "du maurier", "fag", "smokes", "smoks", "smok", "bogey", "durry", "fags", "square"];
 
 
 
@@ -154,17 +150,16 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     let params = [];
     let measure;
     let size;
+    let changeInAlcohol = 0;
     let keyword; // Set, Remove, add, 
 
     // General command format:
     // (Optional)! (Optional)keyword (Optional)number product (Optional)parameters*
 
     console.log("Starting to parse the command.");
-
     console.log(`Args: ${args}, len: ${args.length}`);
-    for(let i = 0; i < args.length; i++){
 
-    	console.log(!isNaN(args[i]));
+    for(let i = 0; i < args.length; i++){
     	if(!isNaN(args[i])){
     		// An amount was specified or potentially an amount of ounces/millileters/liters
 
@@ -172,7 +167,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 // I want to access the next element, so make sure we're not at the end of the array first.
 
                 for(let j = 0; j < volumeKeywordsList.length; j++){
-                    if(args[i + 1] == volumeKeywordsList[j]){
+                    if(args[i + 1].toLowerCase() == volumeKeywordsList[j]){
                         if(measure)
                         measure = args[i + 1];
                         size = parseFloat(args[i]);
@@ -197,9 +192,9 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
     		let exitFlag = false;
     		for(let j = 0; j < productList.length; j++){
-    			if(productList[j] === args[i]){
+    			if(productList[j] == args[i].toLowerCase()){
     				// Found a match. Argument was the product to track.
-    				cmd = args[i];
+    				cmd = args[i].toLowerCase();
 
     				// We've found a match, so no need to continue looking
     				exitFlag = true;
@@ -210,9 +205,16 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
     		if(!exitFlag){
     			for(let j = 0; j < argumentList.length; j++){
-	    			if(argumentList[j] === args[i]){
+	    			if(argumentList[j] === args[i].toLowerCase()){
 	    				// Found a match. Argument was an argument
-	    				params.push(args[i]);
+	    				params.push(args[i].toLowerCase());
+                        if(args[i].toLowerCase() == "sleeve" || 
+                            args[i].toLowerCase() == "sleeves" ||
+                            args[i].toLowerCase() == "pints" ||
+                            args[i].toLowerCase() == "pint"
+                            ){
+                            cmd = "beer";
+                        }
 
 	    				// We've found a match, so no need to continue looking
 	    				exitFlag = true;
@@ -224,9 +226,9 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
     		if(!exitFlag){
     			for(let j = 0; j < keywordsList.length; j++){
-	    			if(keywordsList[j] === args[i]){
+	    			if(keywordsList[j] === args[i].toLowerCase()){
 	    				// Found a match. Argument was a keyword
-	    				keyword = args[i];
+	    				keyword = args[i].toLowerCase();
 
 	    				// We've found a match, so no need to continue looking
 	    				exitFlag = true;
@@ -237,19 +239,19 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     		}
 
             if(!exitFlag){
-                if(beer.includes(args[i])){
+                if(beer.includes(args[i].toLowerCase())){
                     // The token matched a type of beer
                     cmd = "beer";
                 }
             }
             if(!exitFlag){
-                if(spirits.includes(args[i])){
+                if(spirits.includes(args[i].toLowerCase())){
                     // The token matched a type of beer
                     cmd = "spirit";
                 }
             }
             if(!exitFlag){
-                if(wine.includes(args[i])){
+                if(wine.includes(args[i].toLowerCase())){
                     // The token matched a type of beer
                     cmd = "wine";
                 }
@@ -262,22 +264,36 @@ bot.on('message', function (user, userID, channelID, message, evt) {
      console.log(`Amount: ${amount}, Product: ${cmd}, Params: ${params}, Keyword: ${keyword}, Measure: ${measure}`);
 
     let msgStr;
+    if(amount == undefined){
+        // An amount wasn't specified, but we're going to assume they meant they had 1 drink.
+        amount = 1;
+    }
+    amount = parseFloat(amount, 10);
+
+    for(let i = 0; i < params.length; i++){
+    if(params[i] == "double"){
+            amount *= 2;
+        }
+        if(params[i] == "half"){
+            amount /= 2;
+        }
+    }
+
     switch(cmd){
         case "beer":
         case "beers":
 
 
             for(let i = 0; i < params.length; i++){
-                if(params[i] == "tall" ||
-                    params[i] == "half" || 
-                    params[i] == "sleeve" ||
+                if(params[i] == "tall" || 
                     params[i] == "pint"){
                     measure = params[i];
                 }
                 if(params[i] == "pints"){
                     measure = "pint";
                 }
-                if(params[i] == "sleeves"){
+                if( params[i] == "sleeve"  ||
+                    params[i] == "sleeves" ){
                     measure = "sleeve";
                 }
             }
@@ -289,19 +305,22 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     size *= -1;
             }
 
+            changeInAlcohol = size;
             totAlcoholVol += size;
-            
-            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol, "beer");
+            Api.submitAlcohol(userID, "beer", changeInAlcohol);
+            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol,);
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
             });
+
         break;
         case "spirit":
 
             for(let i = 0; i < params.length; i++){
-                if(params[i] == "double" || 
-                    params[i] == "bottle" ||
+                if( params[i] == "bottle" ||
+                    params[i] == "mickey" ||
+                    params[i] == "mickeys" ||
                     params[i] == "bottles"){
                     measure = params[i];
                 }
@@ -314,10 +333,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     // User probably made a mistake and wants to remove that amount of liquor from the record.
                     size *= -1;
             }
-
+            changeInAlcohol = size;
             totAlcoholVol += size;
-            
-            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol, "spirit");
+            Api.submitAlcohol(userID, "spirits", changeInAlcohol);
+            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol,);
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
@@ -325,12 +344,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         break;
         case "drink":
         case "drinks":
-
-            for(let i = 0; i < params.length; i++){
-                if(params[i] == "half"){
-                    measure = params[i];
-                }
-            }
 
             console.log(`Amount: ${amount}, Product: ${cmd}, Keyword: ${keyword}, Measure: ${measure}, Size: ${size}` );
             size = calcVolAlc(size, measure, amount, "drink");
@@ -340,9 +353,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     size *= -1;
             }
 
+changeInAlcohol = size;
             totAlcoholVol += size;
-            
-            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol, "drink");
+            Api.submitAlcohol(userID, "beer", changeInAlcohol);
+            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol);
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
@@ -350,7 +364,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         break;
         case "wine":
             for(let i = 0; i < params.length; i++){
-                if(params[i] == "half" || 
+                if(
                     params[i] == "bottle" ||
                     params[i] == "bottles"){
                     measure = params[i];
@@ -363,10 +377,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     // User probably made a mistake and wants to remove that amount of liquor from the record.
                     size *= -1;
             }
-
+            changeInAlcohol = size;
             totAlcoholVol += size;
-            
-            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol, "wine");
+            Api.submitAlcohol(userID, "wine", changeInAlcohol);
+            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol);
             bot.sendMessage({
                 to: channelID,
                 message: msgStr
@@ -380,13 +394,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
 function calcVolAlc(size, measure, amount, product){
     console.log(`START: Amount: ${amount}, Product: ${product}, Measure: ${measure}, Size: ${size}`);
-
-    if(amount == undefined){
-        // An amount wasn't specified, but we're going to assume they meant they had 1 drink.
-        amount = 1;
-    }
-    
-    amount = parseFloat(amount, 10);
 
     if(size != undefined){
         size = parseFloat(size, 10);// could be undef
@@ -421,6 +428,11 @@ function calcVolAlc(size, measure, amount, product){
         size = sleeveVol;
     }
 
+    if(measure == "mickey" ||
+        measure == "mickeys"){
+        size = mickeyVol;
+    }
+
     if(measure == "bottle" ||
         measure == "bottles"){
         size = bottleWineVol;
@@ -428,14 +440,6 @@ function calcVolAlc(size, measure, amount, product){
 
     if(measure == "pint" || measure == "pints"){
         size = pintVol;
-    }
-
-    if(measure == "half"){
-        amount /= 2;
-    }
-
-    if(measure == "double"){
-        amount *= 2;
     }
 
     if(measure == undefined){
@@ -478,14 +482,15 @@ function calcVolAlc(size, measure, amount, product){
     return size;
 }
 
-function alcoholConsumptionStringBuilder(user, volConsumed, product){
+function alcoholConsumptionStringBuilder(user, volConsumed){
     let msgString = "";
     let dailyLimit = dailyBeerLimit; //dailyLimit in ml
     // let weeklyLimit = weeklyBeerLimit;
 
     let drinks = (volConsumed / standardDrinkVol).toFixed(1);
 
-    if(drinks < 0 && drinks > -0.1){
+    if(drinks < 0){
+        // it doesn't make sence to have a negative amount of drinks.
         drinks = 0.0;
     }
     msgString += `${user} you've had ${drinks} drinks.`;
@@ -513,83 +518,3 @@ function alcoholConsumptionStringBuilder(user, volConsumed, product){
     console.log(`RETURN STRING: ${msgString}`);
     return msgString;
 }
-
-// function beerStringBuilder(user){
-// 	let msgString = "";
-// 	let dailyLimit = dailyBeerLimit;
-// 	let weeklyLimit = weeklyBeerLimit;
-// 	let count = beerCount;
-
-//     msgString += `${user} you've drank ${count} `;
-
-// 	if(count == 1){
-// 		msgString += "beer.";
-// 	}
-// 	else{
-// 		msgString += "beers.";
-// 	}
-
-// 	if(dailyLimit - count == 0){
-// 		msgString += " You have reached your daily drinking limit and should not continue drinking!";
-// 	}
-// 	else if(dailyLimit - count == -1){
-// 		// user has drank 1 beer past their limit.
-// 		msgString += " You have surpassed your daily drinking limit! Your liver is crying and would like you to please stop ;-; ";
-// 	}
-// 	else if(dailyLimit - count < -1){
-// 		// user has drank 1 beer past their limit.
-// 		msgString += " You have greatly surpassed your daily drinking limit! Future 'you' is going to be very disappointed.";
-// 	}
-// 	else if(dailyLimit - count <= 2){
-// 		msgString += ` You are nearing your desired daily beer limit of ${dailyLimit} `;
-// 		if(dailyLimit == 1){
-// 			msgString += "beer.";
-// 		}
-// 		else{
-// 			msgString += "beers.";
-// 		}
-// 	}
-
-// 	console.log(`RETURN STRING: ${msgString}`);
-// 	return msgString;
-// }
-
-// function wineStringBuilder(user){
-//     let msgString = "";
-//     let dailyLimit = dailyWineLimit;
-//     let weeklyLimit = weeklyWineLimit;
-//     let count = wineCount;
-
-//     msgString += `${user} you've drank ${count} `;
-
-//     if(count == 1){
-//         msgString += "glass of wine.";
-//     }
-//     else{
-//         msgString += "glasses of wine.";
-//     }
-
-//     if(dailyLimit - count == 0){
-//         msgString += " You have reached your daily drinking limit and should not continue drinking!";
-//     }
-//     else if(dailyLimit - count == -1){
-//         // user has drank 1 beer past their limit.
-//         msgString += " You have surpassed your daily drinking limit! Your liver is crying and would like you to please stop ;-; ";
-//     }
-//     else if(dailyLimit - count < -1){
-//         // user has drank 1 beer past their limit.
-//         msgString += " You have greatly surpassed your daily drinking limit! Future 'you' is going to be very disappointed.";
-//     }
-//     else if(dailyLimit - count <= 2){
-//         msgString += ` You are nearing your desired daily alcohol limit of ${dailyLimit} `;
-//         if(dailyLimit == 1){
-//             msgString += "glass of wine.";
-//         }
-//         else{
-//             msgString += "glasses of wine.";
-//         }
-//     }
-
-//     console.log(`RETURN STRING: ${msgString}`);
-//     return msgString;
-// }
