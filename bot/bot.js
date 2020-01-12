@@ -134,15 +134,13 @@ let displayMetric = false;
 // });
 
 bot.on('message', function (user, userID, channelID, message, evt) {
-//     // Our bot needs to know if it will execute a command
-//     // It will listen for messages that will start with `!`
-
-    // if(message.channel.type != "dm" && message.substring(0, 1) != '!'){
+    // if(channelID != "dm" && message.substring(0, 1) != '!'){
     // 	// Messages must start with the '!' character in order for the bot to attepmt to process the command.
     // 	// Direct messages can optionally start with the '!' character, but it's not required.
     // 	return;
     // }
 
+    // You don't want the bot to process messages that the bot itself sends.
     if(user == bot.username){ return};
 
     if(message.substring(0, 1) == '!'){
@@ -307,6 +305,31 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 message: msgStr
             });
         break;
+        case "drink":
+        case "drinks":
+
+            for(let i = 0; i < params.length; i++){
+                if(params[i] == "half"){
+                    measure = params[i];
+                }
+            }
+
+            console.log(`Amount: ${amount}, Product: ${cmd}, Keyword: ${keyword}, Measure: ${measure}, Size: ${size}` );
+            size = calcVolAlc(size, measure, amount, "drink");
+
+            if(keyword == "remove"){
+                    // User probably made a mistake and wants to remove that amount of liquor from the record.
+                    size *= -1;
+            }
+
+            totAlcoholVol += size;
+            
+            msgStr = alcoholConsumptionStringBuilder(user, totAlcoholVol, "drink");
+            bot.sendMessage({
+                to: channelID,
+                message: msgStr
+            });
+        break;
         case "wine":
             for(let i = 0; i < params.length; i++){
                 if(params[i] == "half" || 
@@ -408,6 +431,9 @@ function calcVolAlc(size, measure, amount, product){
         else if(product == "wine"){
             size = defaultWineVol;
         }
+        else if(product == "drink"){
+            size = standardDrinkVol;
+        }
     }
 
     // merge size with amount
@@ -423,6 +449,10 @@ function calcVolAlc(size, measure, amount, product){
     }
     else if(product == "wine"){
         size *= avgWinePercent;
+    }
+    else if(product == "drink"){
+        // Drinks are considered to be 17.7ml of 100%
+        size *= 1;
     }
 
     // return value is 100% alcohol in ml
