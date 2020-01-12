@@ -6,11 +6,13 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 from .viewsets import (
-    current_user,
-    ObtainAuthTokenView,
-    UserViewSet,
+    current_user_from_discord_id,
+    current_user_from_token,
     DataPointAlcoholViewSet,
     DataPointNicotineViewSet,
+    ObtainAuthTokenView,
+    UserViewSet,
+    VapeViewSet,
 )
 
 
@@ -32,6 +34,7 @@ router = OptionalSlashRouter()
 router.register("data-alcohol", DataPointAlcoholViewSet)
 router.register("data-nicotine", DataPointNicotineViewSet)
 router.register("users", UserViewSet)
+router.register("vapes", VapeViewSet)
 
 
 # Schema for Swagger API
@@ -47,7 +50,11 @@ urlpatterns = [
     path(r"", include(router.urls)),
     path(r"auth/", include("rest_framework.urls")),
     path(r"api-token-obtain/", ObtainAuthTokenView.as_view()),
-    path(r"api-token-current-user/<str:token>/", current_user),
+    path(r"api-token-current-user/<str:token>/", current_user_from_token),
+    path(
+        r"discord-id-current-user/<str:discord_id>/",
+        current_user_from_discord_id,
+    ),
     path(
         r"redoc/",
         schema_view.with_ui("redoc", cache_timeout=None),

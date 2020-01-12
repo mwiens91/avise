@@ -11,22 +11,19 @@ from rest_framework.permissions import AllowAny, BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .models import (
-    DataPointAlcohol,
-    DataPointNicotine,
-    User,
-)
+from .models import DataPointAlcohol, DataPointNicotine, User, Vape
 from .serializers import (
     DataPointAlcoholSerializer,
     DataPointNicotineSerializer,
     UserReadOnlySerializer,
     UserWriteSerializer,
+    VapeSerializer,
 )
 
 
 class AllowAnyForPostAndGetPermission(BasePermission):
     def has_permission(self, request, view):
-        if request.method in ["post", "get"]:
+        if request.method in ["POST", "GET"]:
             return True
 
         return request.user and request.user.is_authenticated
@@ -36,7 +33,7 @@ class AllowAnyForPostAndGetPermission(BasePermission):
     method="get", responses={status.HTTP_200_OK: UserReadOnlySerializer}
 )
 @api_view(["GET"])
-def current_user(request, token):
+def current_user_from_token(request, token):
     """Determine the current user by their token, and return their data."""
     try:
         user = Token.objects.get(key=token).user
@@ -47,6 +44,25 @@ def current_user(request, token):
         )
 
     return Response(UserReadOnlySerializer(user).data)
+
+
+@swagger_auto_schema(
+    method="get", responses={status.HTTP_200_OK: UserReadOnlySerializer}
+)
+@api_view(["GET"])
+def current_user_from_discord_id(request, discord_id):
+    """Determine the current user by their Discord ID, and return their data."""
+    users = User.objects.filter(discord_id=discord_id)
+
+    if not users:
+        return Response(
+            {
+                "Bad request": "Discord ID does not correspond to an existing user"
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    return Response(UserReadOnlySerializer(users.first()).data)
 
 
 class ObtainAuthTokenView(APIView):
@@ -79,7 +95,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """A viewset for users."""
 
     def get_serializer_class(self, *args, **kwargs):
-        if self.request.method in ("post", "patch"):
+        if self.request.method in ("POST", "PATCH"):
             return UserWriteSerializer
 
         return UserReadOnlySerializer
@@ -104,3 +120,11 @@ class DataPointNicotineViewSet(viewsets.ModelViewSet):
     queryset = DataPointNicotine.objects.all()
     http_method_names = ["get", "post", "patch", "delete"]
     serializer_class = DataPointNicotineSerializer
+
+
+class VapeViewSet(viewsets.ModelViewSet):
+    """A viewset for vapes."""
+
+    queryset = Vape.objects.all()
+    http_method_names = ["get", "post", "patch", "delete"]
+    serializer_class = VapeSerializer

@@ -14,12 +14,25 @@ class User(AbstractUser):
     track_alcohol = models.BooleanField(
         default=True, help_text="Whether to track alcohol consumption."
     )
+    discord_id = models.CharField(
+        max_length=30, null=True, blank=True, default=None
+    )
 
     class Meta:
         """Model metadata."""
 
         # Order by username in ascending order
         ordering = ["username"]
+
+
+class Vape(models.Model):
+    """A user's vape configuration."""
+
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="vape"
+    )
+    volume = models.FloatField()
+    strength = models.FloatField()
 
 
 class AbstractDataPoint(models.Model):
