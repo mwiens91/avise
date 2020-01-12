@@ -5,12 +5,15 @@ import LoginModal from './auth/LoginModal';
 import RegisterModal from './auth/RegisterModal';
 import '../css/App.css';
 
+import Api from '../Api';
+
 class AppNavBar extends Component {
 	state = {
 		isOpen: false,
 		isAuth: false,
-		username: null,
+		user: null,
 	};
+	Api = new Api(process.env.REACT_APP_API_URL);
 
 	toggle = () => {
 		this.setState({
@@ -18,22 +21,37 @@ class AppNavBar extends Component {
 		});
 	};
 
-	login = (username, password) => {
-		// Authenticate here with API call
+	login = async (username, password) => {
+		const data = {
+			username,
+			password,
+		};
+		const tokenJson = await this.Api.getApiTokenWithBasicAuth(data);
+		localStorage.setItem('token', tokenJson.token);
 
-		this.setState({
-			isAuth: true,
-			username: username,
-		});
-		localStorage.setItem('user', JSON.stringify(username));
+		this.Api.setToken(tokenJson.token);
+
+		try {
+			const user = await this.Api.getUserFromApiToken();
+
+			this.setState({
+				isAuth: true,
+				user: user,
+			});
+			localStorage.setItem('user', JSON.stringify(user));
+		} catch (e) {
+			this.logout();
+		}
 	};
 
 	logout = () => {
 		this.setState({
 			isAuth: false,
-			username: null,
+			user: null,
 		});
-		localStorage.removeItem('user');
+		this.Api.setToken(null);
+		localStorage.removeItem('token');
+		localStorage.setItem('user', null);
 	};
 
 	register = (data) => {
@@ -68,7 +86,7 @@ class AppNavBar extends Component {
 				<NavItem>
 					{/* Need to change the link to be the username */}
 					<Link to="/user" className="nav-link text-link">
-						<strong>{this.state.username ? this.state.username : ''}</strong>
+						<strong>{this.state.user ? this.state.user.username : ''}</strong>
 					</Link>
 				</NavItem>
 				<NavItem>
@@ -80,7 +98,7 @@ class AppNavBar extends Component {
 		);
 		return (
 			<div>
-				<Navbar expand="sm" className="mb-5 navbar-style">
+				<Navbar dark expand="sm" className="mb-5 navbar-style">
 					<Container>
 						<Link to="/" className="navbar-brand text-link work-sans">
 							<strong>Avise</strong>

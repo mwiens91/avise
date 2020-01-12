@@ -14,29 +14,9 @@ import {
 } from 'recharts';
 
 class Substance extends Component {
+	state = {};
 	render() {
-		const data = [
-			{
-				name: 'Page A',
-				uv: 4000,
-				pv: 2400,
-			},
-			{
-				name: 'Page B',
-				uv: 3000,
-				pv: 1398,
-			},
-			{
-				name: 'Page C',
-				uv: 2000,
-				pv: 9800,
-			},
-			{
-				name: 'Page D',
-				uv: 2780,
-				pv: 3908,
-			},
-		];
+		console.log(this.props.substances);
 
 		return (
 			<div>
@@ -45,7 +25,7 @@ class Substance extends Component {
 						<LineChart
 							width={500}
 							height={300}
-							data={data}
+							data={this.props.data}
 							margin={{
 								top: 5,
 								right: 30,
@@ -66,7 +46,7 @@ class Substance extends Component {
 						<BarChart
 							width={500}
 							height={300}
-							data={data}
+							data={this.props.data}
 							margin={{
 								top: 5,
 								right: 30,
