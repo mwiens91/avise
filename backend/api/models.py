@@ -36,11 +36,28 @@ class AbstractDataPoint(models.Model):
 
 
 class DataPointNicotine(AbstractDataPoint):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="nicotine_data_points")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="nicotine_data_points"
+    )
+    category = models.CharField(
+        max_length=25,
+        choices=[
+            ("cigarette", "cigarette"),
+            ("gum", "gum"),
+            ("patch", "patch"),
+            ("vape", "vape"),
+        ],
+    )
 
 
 class DataPointAlcohol(AbstractDataPoint):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="alcohol_data_points")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="alcohol_data_points"
+    )
+    category = models.CharField(
+        max_length=25,
+        choices=[("beer", "beer"), ("spirits", "spirits"), ("wine", "wine"),],
+    )
 
 
 @receiver(post_save, sender=User)
