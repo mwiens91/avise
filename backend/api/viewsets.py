@@ -11,18 +11,13 @@ from rest_framework.permissions import AllowAny, BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .models import (
-    DataPointAlcohol,
-    DataPointNicotine,
-    User,
-    Vape
-)
+from .models import DataPointAlcohol, DataPointNicotine, User, Vape
 from .serializers import (
     DataPointAlcoholSerializer,
     DataPointNicotineSerializer,
     UserReadOnlySerializer,
     UserWriteSerializer,
-    VapeSerializer
+    VapeSerializer,
 )
 
 
@@ -38,7 +33,7 @@ class AllowAnyForPostAndGetPermission(BasePermission):
     method="get", responses={status.HTTP_200_OK: UserReadOnlySerializer}
 )
 @api_view(["GET"])
-def current_user(request, token):
+def current_user_from_token(request, token):
     """Determine the current user by their token, and return their data."""
     try:
         user = Token.objects.get(key=token).user
@@ -49,6 +44,23 @@ def current_user(request, token):
         )
 
     return Response(UserReadOnlySerializer(user).data)
+
+
+@swagger_auto_schema(
+    method="get", responses={status.HTTP_200_OK: UserReadOnlySerializer}
+)
+@api_view(["GET"])
+def current_user_from_discord_id(request, discord_id):
+    """Determine the current user by their Discord ID, and return their data."""
+    users = User.objects.filter(discord_id=discord_id)
+
+    if not users:
+        return Response(
+            {"Bad request": "Token does not correspond to an existing user"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    return Response(UserReadOnlySerializer(users.first()).data)
 
 
 class ObtainAuthTokenView(APIView):
