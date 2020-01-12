@@ -4,13 +4,14 @@ import { Button, Modal, ModalHeader, ModalBody, Form, FormGroup, Label, Input } 
 class EditUserModal extends Component {
 	state = {
 		modal: false,
-		discord_id: this.props.user.discord_id ? this.props.user.discord_id : null,
+		discord_id: this.props.user.discord_id ? this.props.user.discord_id : '',
 		track_nicotine: this.props.user.track_nicotine,
 		track_alcohol: this.props.user.track_alcohol,
 	};
 	toggle = () => {
 		this.setState({
 			modal: !this.state.modal,
+			discord_id: this.props.user.discord_id ? this.props.user.discord_id : '',
 			track_nicotine: this.props.user.track_nicotine,
 			track_alcohol: this.props.user.track_alcohol,
 		});
@@ -25,15 +26,16 @@ class EditUserModal extends Component {
 	onSubmit = (e) => {
 		e.preventDefault();
 
-		const { strength, volume } = this.state;
+		const { discord_id, track_alcohol, track_nicotine } = this.state;
 
 		const data = {
-			user: this.props.userId,
-			volume: volume,
-			strength: strength,
+			username: this.props.user.username,
+			discord_id: discord_id,
+			track_alcohol: track_alcohol,
+			track_nicotine: track_nicotine,
 		};
 
-		this.props.createVape(data);
+		this.props.updatePref(data);
 		this.toggle();
 	};
 	render() {
@@ -55,6 +57,7 @@ class EditUserModal extends Component {
 									name="discord_id"
 									id="discord_id"
 									className="mb-3"
+									value={this.state.discord_id}
 									onChange={this.onChange}
 								/>
 								<FormGroup check>
