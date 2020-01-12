@@ -43,7 +43,7 @@ class user {
   }
 }
 
-const ounceToMili = 29.5735;
+const ounceToMils = 29.5735;
 const avgBeerPercent = 0.05;
 const avgWinePercent = 0.12;
 const avgSpiritPercent = 0.40;
@@ -63,7 +63,7 @@ const bottleWineVol = 750;
 let productList = ["beer", "beers", "shot", "shots", "wine", "weed", "mj"];
 let keywordsList = ["remove", "add", "set"];
 let argumentList = ["tall", "half", "sleeve", "sleeves", "pints", "pint", "bottle", "bottles", "double"];
-let volumeKeywordsList = ["millileters", "millileter", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
+let volumeKeywordsList = ["millileters", "millileter", "ml", "L", "liters", "liter", "oz", "oz.", "ounce", "ounces"]; // Note, keywords like pint or sleeve will be tracked elsewhere.
 
 
 var beer = ["beer", "beers", "wine", "spirit", "pbr", "pabst", "pabst blue ribbon",
@@ -79,6 +79,8 @@ var spirits = ["shot", "vodka", "whiskey", "tequila", "shooter", "rum",
 
 var cigarette = ["cigarette", "cig", "cug", "smoke", "dart", "buck", "cigarettes",
     "belmont", "pall mall", "dumaurier", "du maurier", "fag", "smokes", "smoks", "smok",
+
+
     "bogey", "durry", "fags", "square"];
 
 
@@ -173,18 +175,24 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
                 for(let j = 0; j < volumeKeywordsList.length; j++){
                     if(args[i + 1] == volumeKeywordsList[j]){
+                        if(measure)
                         measure = args[i + 1];
-                        size = parseInt(args[i]);
+                        size = parseFloat(args[i]);
+                        break;
                     }
                 }
+
+                // it wasn't a measure, so the number was an amount.
+                if(amount == undefined){
+                    amount = parseFloat(args[i]);
+                }
             }
-
-    		if(amount !== undefined){
-    			// Amount was specified more than once. Throw an error.
-    			// TODO:
-    		}
-
-    		amount = args[i];
+            else{
+                //no chance as being a measure, so just treat it as an amount
+                if(amount == undefined){
+                    amount = parseFloat(args[i]);
+                }
+            }
     	}
     	else{
     		// argument is some kind of word. Try to determine the type.
@@ -244,7 +252,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
             for(let i = 0; i < params.length; i++){
                 if(params[i] == "tall" ||
-                    //params[i] == "half" || 
+                    params[i] == "half" || 
                     params[i] == "sleeve" ||
                     params[i] == "pint"){
                     measure = params[i];
@@ -337,15 +345,16 @@ function calcVolAlc(size, measure, amount, product){
         amount = 1;
     }
     
-    amount = parseInt(amount, 10);
+    amount = parseFloat(amount, 10);
 
     if(size != undefined){
-        size = parseInt(size, 10);// could be undef
+        size = parseFloat(size, 10);// could be undef
     }
 
     // Got to determine the quantity of alcohol consumed. Everything will be converted to millileters.
     if( measure == "millileters"    ||
-        measure == "millileter"){
+        measure == "ml"             ||
+        measure == "millileter"     ){
     }
 
     if( measure == "ounce"    ||
@@ -353,11 +362,12 @@ function calcVolAlc(size, measure, amount, product){
         measure == "oz"       ||
         measure == "oz."){
         // Convert to ml
-        size *= ounceToMili;
+        size *= ounceToMils;
     }
 
     if( measure == "liter"    ||
-        measure == "liters"){
+        measure == "L"        ||
+        measure == "liters"   ){
         size *= 1000;
     }
 
@@ -426,6 +436,10 @@ function alcoholConsumptionStringBuilder(user, volConsumed, product){
     // let weeklyLimit = weeklyBeerLimit;
 
     let drinks = (volConsumed / standardDrinkVol).toFixed(1);
+
+    if(drinks < 0 && drinks > -0.1){
+        drinks = 0.0;
+    }
     msgString += `${user} you've had ${drinks} drinks.`;
 
     let limitRatio = volConsumed / dailyLimit;
