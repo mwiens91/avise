@@ -7,10 +7,11 @@ from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 from .viewsets import (
     current_user,
-    ObtainAuthTokenView,
-    UserViewSet,
     DataPointAlcoholViewSet,
     DataPointNicotineViewSet,
+    ObtainAuthTokenView,
+    UserViewSet,
+    VapeViewSet
 )
 
 
@@ -32,6 +33,7 @@ router = OptionalSlashRouter()
 router.register("data-alcohol", DataPointAlcoholViewSet)
 router.register("data-nicotine", DataPointNicotineViewSet)
 router.register("users", UserViewSet)
+router.register("vapes", VapeViewSet)
 
 
 # Schema for Swagger API

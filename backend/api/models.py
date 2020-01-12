@@ -25,6 +25,16 @@ class User(AbstractUser):
         ordering = ["username"]
 
 
+class Vape(models.Model):
+    """A user's vape configuration."""
+
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="vape"
+    )
+    volume = models.FloatField()
+    strength = models.FloatField()
+
+
 class AbstractDataPoint(models.Model):
     """Sets up basic structure for data points.
 

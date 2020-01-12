@@ -5,11 +5,20 @@ from .models import (
     DataPointAlcohol,
     DataPointNicotine,
     User,
+    Vape,
 )
 
 
+class VapeSerializer(serializers.ModelSerializer):
+    """A serializer for vapes."""
+
+    class Meta:
+        model = Vape
+        fields = ("id", "user", "volume", "strength")
+
+
 class DataPointAlcoholSerializer(serializers.ModelSerializer):
-    """A serializer for a alcohol data points."""
+    """A serializer for alcohol data points."""
 
     class Meta:
         model = DataPointAlcohol
@@ -17,7 +26,7 @@ class DataPointAlcoholSerializer(serializers.ModelSerializer):
 
 
 class DataPointNicotineSerializer(serializers.ModelSerializer):
-    """A serializer for a nicotine data points."""
+    """A serializer for nicotine data points."""
 
     class Meta:
         model = DataPointNicotine
@@ -25,8 +34,9 @@ class DataPointNicotineSerializer(serializers.ModelSerializer):
 
 
 class UserReadOnlySerializer(serializers.ModelSerializer):
-    """A read-only serializer for a user."""
+    """A read-only serializer for users."""
 
+    vape = VapeSerializer()
     alcohol_data_points = DataPointAlcoholSerializer(many=True)
     nicotine_data_points = DataPointNicotineSerializer(many=True)
 
@@ -37,6 +47,7 @@ class UserReadOnlySerializer(serializers.ModelSerializer):
             "track_nicotine",
             "track_alcohol",
             "discord_id",
+            "vape",
             "alcohol_data_points",
             "nicotine_data_points",
             "date_joined",
@@ -46,7 +57,7 @@ class UserReadOnlySerializer(serializers.ModelSerializer):
 
 
 class UserWriteSerializer(serializers.ModelSerializer):
-    """A write serializer for a user."""
+    """A write serializer for users."""
 
     class Meta:
         model = User

@@ -15,12 +15,14 @@ from .models import (
     DataPointAlcohol,
     DataPointNicotine,
     User,
+    Vape
 )
 from .serializers import (
     DataPointAlcoholSerializer,
     DataPointNicotineSerializer,
     UserReadOnlySerializer,
     UserWriteSerializer,
+    VapeSerializer
 )
 
 
@@ -104,3 +106,11 @@ class DataPointNicotineViewSet(viewsets.ModelViewSet):
     queryset = DataPointNicotine.objects.all()
     http_method_names = ["get", "post", "patch", "delete"]
     serializer_class = DataPointNicotineSerializer
+
+
+class VapeViewSet(viewsets.ModelViewSet):
+    """A viewset for vapes."""
+
+    queryset = Vape.objects.all()
+    http_method_names = ["get", "post", "patch", "delete"]
+    serializer_class = VapeSerializer
