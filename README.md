@@ -3,6 +3,9 @@
 Avise is a convenient and powerful platform for people who consume
 substances to do so in an informed and responsible way.
 
+![Avi the bot](avi.png)
+*Avi the bot*
+
 ## How it works!
 
 Avise was created to help inform users of the effects substances have on
