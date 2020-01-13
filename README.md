@@ -11,7 +11,7 @@ substances to do so in an informed and responsible way.
 Avise was created to help inform users of the effects substances have on
 their health. This is achieved through
 
-+ integrating bots on popular messaging services to conventiently track
++ integrating bots on popular messaging services to conveniently track
   user data
 
 + providing real-time visualizations of users' consumption of
