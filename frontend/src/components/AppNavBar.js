@@ -77,7 +77,7 @@ class AppNavBar extends Component {
 				<Navbar dark expand="sm" className="mb-5 navbar-style">
 					<Container>
 						<Link to="/" className="navbar-brand text-link work-sans">
-							<img src="/favicon1.ico" width="50" height="50" alt="" />
+							<img src="/avise/favicon1.ico" width="50" height="50" alt="" />
 							<strong> Avise</strong>
 						</Link>
 						<NavbarToggler onClick={this.toggle} />

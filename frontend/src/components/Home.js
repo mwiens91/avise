@@ -10,14 +10,21 @@ class Home extends Component {
 				<Jumbotron className="jumbo-color">
 					<h1 className="display-3 work-sans">Avise</h1>
 					<p className="lead">
-						Inform people on the impacts of their substance use and help them reach whatever goals
-						they have.
+						Inform people on the impacts of their substance use and help them reach their goals.
 					</p>
 					<hr className="my-2" />
 					<p>
-						Avise was created to help inform users of the effects of various substances on their
-						health. While not designed specifically as a quitting aid, avise may be used to
-						supplement other tools and resources for cessation.
+						Avise was created to help inform users of the effects substances have on their
+						health. This is achieved through
+					</p>
+					<ul>
+						<li>integrating bots on popular messaging services to conventiently track user data;</li>
+						<li>providing real-time visualizations of users' consumption of potentially harmful substances;</li>
+						<li>citing research tailored to the users' personal usage patterns;</li>
+					</ul>
+					<p>
+						Avise provides a convenient and powerful platform for people who consume substances to do so
+						in an informed and responsible way.
 					</p>
 				</Jumbotron>
 
@@ -25,11 +32,22 @@ class Home extends Component {
 					<Col>
 						<Card>
 							<h1 className="mt-3" style={{ fontSize: '1.5rem', textAlign: 'center' }}>
-								Discord
+								Avi the bot
 							</h1>
+							<img
+								style={{
+							        textAlign: 'center',
+								display: 'block',
+								justifyContent: 'center',
+								alignItems: 'center',
+								margin: 'auto',
+								}}
+								src="/avise/Jump_11.png" width="100px"/>
 							<CardBody>
-								A Discord bot is used to input the users use of substances. Users will input data
-								using everyday language.
+								<p>
+								Avi is a multi-platform messaging bot designed to interpret conversional language.
+								Avi tracks substances consumption data and sends it to Avise's REST API.
+								</p>
 							</CardBody>
 						</Card>
 					</Col>
@@ -37,22 +55,42 @@ class Home extends Component {
 					<Col>
 						<Card>
 							<h1 className="mt-3" style={{ fontSize: '1.5rem', textAlign: 'center' }}>
-								Rechart.js
+								avise.tech
 							</h1>
+							<img
+								style={{
+							        textAlign: 'center',
+								display: 'block',
+								justifyContent: 'center',
+								alignItems: 'center',
+								margin: 'auto',
+								}}
+								src="/avise/favicon1.ico" width="86px"/>
 							<CardBody>
-								The users data will be visualized using Rechart.js to inform the user of their use.
-								Data will be pulled from weekly and daily use.
+								<p>
+								<a href="">avise.tech</a> provides analytics and visualizations personalized for users'
+								unique data and history.								</p>
 							</CardBody>
 						</Card>
 					</Col>
 					<Col>
 						<Card>
 							<h1 className="mt-3" style={{ fontSize: '1.5rem', textAlign: 'center' }}>
-								Google Cloud
+								 Powered by research
 							</h1>
+							<img
+								style={{
+							        textAlign: 'center',
+								display: 'block',
+								justifyContent: 'center',
+								alignItems: 'center',
+								margin: 'auto',
+								}}
+								src="https://image.flaticon.com/icons/svg/2452/2452520.svg" width="86px"/>
 							<CardBody>
-								Phasellus quis tincidunt nisl. Mauris aliquet sollicitudin sapien, at blandit quam
-								eleifend nec. Ut non aliquet est.
+								Avise
+								provides peer-reviewed articles about potential health risks based on users'
+								substance use data.
 							</CardBody>
 						</Card>
 					</Col>

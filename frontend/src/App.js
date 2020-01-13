@@ -121,7 +121,7 @@ class App extends Component {
 		const { isAuth, user, error } = this.state;
 		return (
 			<div>
-				<Router>
+				<Router basename={'/avise'}>
 					<AppNavBar
 						isAuth={isAuth}
 						user={user}
